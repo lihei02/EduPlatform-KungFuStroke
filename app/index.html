@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>筆畫功夫 · Stroke Kung Fu</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700;900&family=Noto+Sans+SC:wght@400;500;700;900&family=Noto+Serif+TC:wght@500;700;900&family=Noto+Serif+SC:wght@500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+
+  <!-- ============ LOADING ============ -->
+  <section id="screen-loading" class="screen">
+    <div class="loading-bg"></div>
+    <div class="load-glow"></div>
+    <div class="load-spinner">
+      <svg viewBox="0 0 100 100" class="load-ring">
+        <circle cx="50" cy="50" r="40" fill="none" stroke="rgba(245,230,200,.14)" stroke-width="7"/>
+        <circle cx="50" cy="50" r="40" fill="none" stroke="#e8b84a" stroke-width="7" stroke-linecap="round" stroke-dasharray="180 251" transform="rotate(-90 50 50)"/>
+      </svg>
+      <div class="load-glyph">筆</div>
+    </div>
+    <div class="load-progress-wrap">
+      <div class="load-label">載入中 · Loading</div>
+      <div class="load-bar-track"><div id="loadBar" class="load-bar-fill"></div></div>
+      <div id="loadPct" class="load-pct">0%</div>
+    </div>
+  </section>
+
+  <!-- ============ HOME ============ -->
+  <section id="screen-home" class="screen" hidden>
+    <div class="home-bg"></div>
+    <div class="home-gradient"></div>
+    <img class="home-hero" src="assets/Character.png" alt="" draggable="false">
+    <div class="topbar">
+      <button id="btnMute" class="btn-3d btn-sound" aria-label="sound"></button>
+      <div class="lang-wrap">
+        <button id="btnLang" class="btn-3d btn-lang" aria-haspopup="true" aria-expanded="false">
+          <span>🌐</span><span id="langCurrentLabel"></span><span id="langChevron" class="lang-chevron">▾</span>
+        </button>
+        <div id="langMenu" class="lang-menu" hidden></div>
+      </div>
+    </div>
+    <div id="homeTiles" class="home-tiles"></div>
+  </section>
+
+  <!-- ============ LEVEL 1 ============ -->
+  <section id="screen-level1" class="screen level-screen" hidden>
+    <div class="level-bg" style="background-image:url('assets/Level_1_Background.jpg')"></div>
+    <div class="level-gradient level-gradient-l1l3"></div>
+    <div class="hud hud-l1l3">
+      <button id="l1Mute" class="btn-3d btn-hud" aria-label="sound"></button>
+      <button id="l1Pause" class="btn-3d btn-hud" aria-label="pause">❚❚</button>
+      <div id="l1Progress" class="progress-pill"></div>
+    </div>
+    <div class="arena">
+      <div class="arena-side arena-side-left l1l3-side">
+        <div id="l1AvatarBox" class="anim-box">
+          <img id="l1PracticeImg" class="char-img" src="assets/Character_Stand.png" alt="" draggable="false">
+        </div>
+      </div>
+      <div class="arena-center">
+        <canvas id="canvasL1" class="draw-canvas draw-canvas-lg"></canvas>
+        <div id="l1Guide" class="guide-text"></div>
+      </div>
+      <div class="arena-side arena-side-right l1l3-side">
+        <div id="l1DummyBox" class="anim-box">
+          <img class="char-img" src="assets/WoodenDummy.png" alt="" draggable="false">
+        </div>
+      </div>
+    </div>
+    <div class="l1-bottom">
+      <div id="l1StrokeMain" class="stroke-main serif-font"></div>
+      <div id="l1StrokeSub" class="stroke-sub"></div>
+    </div>
+  </section>
+
+  <!-- ============ LEVEL 2 ============ -->
+  <section id="screen-level2" class="screen level-screen" hidden>
+    <div class="level-bg" style="background-image:url('assets/Level_2_Background.png')"></div>
+    <div class="level-gradient level-gradient-l2l4"></div>
+    <div class="hud hud-combat">
+      <button id="l2Mute" class="btn-3d btn-hud" aria-label="sound"></button>
+      <button id="l2Pause" class="btn-3d btn-hud" aria-label="pause">❚❚</button>
+      <div class="hp-col">
+        <div class="hp-row">
+          <span id="l2AvatarLabel" class="hp-label hp-label-avatar"></span>
+          <div class="hp-track"><div id="l2AvatarHpFill" class="hp-fill"></div></div>
+          <span id="l2AvatarHpText" class="hp-text"></span>
+        </div>
+        <div class="hp-row">
+          <span id="l2OppLabel" class="hp-label hp-label-opp"></span>
+          <div class="hp-track"><div id="l2OppHpFill" class="hp-fill"></div></div>
+          <span id="l2OppHpText" class="hp-text"></span>
+        </div>
+      </div>
+      <div class="timer-col">
+        <div id="l2Timer" class="timer-num">--</div>
+        <div class="timer-label">TIME</div>
+      </div>
+    </div>
+    <div class="arena arena-combat">
+      <div class="arena-side arena-side-left combat-side">
+        <div id="l2HurtFlash" class="hurt-flash"></div>
+        <div id="l2AvatarBox" class="anim-box">
+          <img id="l2PlayerImg" class="char-img combat-char-img" src="assets/Character_Stand.png" alt="" draggable="false">
+        </div>
+      </div>
+      <div class="arena-center">
+        <canvas id="canvasL2" class="draw-canvas draw-canvas-lg"></canvas>
+        <div id="l2PromptMain" class="prompt-main serif-font"></div>
+        <div id="l2Guide" class="guide-text"></div>
+      </div>
+      <div class="arena-side arena-side-right combat-side">
+        <svg viewBox="0 0 120 120" class="windup-ring">
+          <circle cx="60" cy="60" r="54" fill="none" stroke="rgba(42,36,32,.35)" stroke-width="5"/>
+          <circle id="l2Ring" cx="60" cy="60" r="54" fill="none" stroke="#e8b84a" stroke-width="6" stroke-linecap="round" transform="rotate(-90 60 60)" stroke-dasharray="339.29" stroke-dashoffset="339.29"/>
+        </svg>
+        <div id="l2OppBox" class="anim-box opp-box">
+          <img id="l2MonkImg" class="char-img opp-img" src="assets/Monk_Stand.png" alt="" draggable="false">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ LEVEL 3 ============ -->
+  <section id="screen-level3" class="screen level-screen" hidden>
+    <div class="level-bg" style="background-image:url('assets/Level_3_Background.jpg')"></div>
+    <div class="level-gradient level-gradient-l1l3"></div>
+    <div class="hud hud-l1l3">
+      <button id="l3Mute" class="btn-3d btn-hud" aria-label="sound"></button>
+      <button id="l3Pause" class="btn-3d btn-hud" aria-label="pause">❚❚</button>
+      <div id="l3Progress" class="progress-pill"></div>
+    </div>
+    <div class="arena">
+      <div class="arena-side arena-side-left l1l3-side">
+        <div id="l3AvatarBox" class="anim-box">
+          <img id="l3PracticeImg" class="char-img" src="assets/Character_Stand.png" alt="" draggable="false">
+        </div>
+      </div>
+      <div class="arena-center">
+        <canvas id="canvasL3" class="draw-canvas draw-canvas-sm"></canvas>
+        <div id="l3Guide" class="guide-text"></div>
+      </div>
+      <div class="arena-side arena-side-right l1l3-side">
+        <div id="l3DummyBox" class="anim-box">
+          <img class="char-img" src="assets/WoodenDummy.png" alt="" draggable="false">
+        </div>
+      </div>
+    </div>
+    <div class="l3-bottom">
+      <div class="l3-char-row">
+        <span id="l3CharMain" class="l3-char-main"></span>
+        <span id="l3Py" class="l3-py"></span>
+        <span id="l3Meaning" class="l3-meaning"></span>
+      </div>
+      <div class="l3-order-row">
+        <span id="l3OrderLabel" class="order-label"></span>
+        <div id="l3Dots" class="dots-row"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ LEVEL 4 ============ -->
+  <section id="screen-level4" class="screen level-screen" hidden>
+    <div class="level-bg" style="background-image:url('assets/Level_4_Background.png')"></div>
+    <div class="level-gradient level-gradient-l2l4"></div>
+    <div class="hud hud-combat">
+      <button id="l4Mute" class="btn-3d btn-hud" aria-label="sound"></button>
+      <button id="l4Pause" class="btn-3d btn-hud" aria-label="pause">❚❚</button>
+      <div class="hp-col">
+        <div class="hp-row">
+          <span id="l4AvatarLabel" class="hp-label hp-label-avatar"></span>
+          <div class="hp-track"><div id="l4AvatarHpFill" class="hp-fill"></div></div>
+          <span id="l4AvatarHpText" class="hp-text"></span>
+        </div>
+        <div class="hp-row">
+          <span id="l4OppLabel" class="hp-label hp-label-opp"></span>
+          <div class="hp-track"><div id="l4OppHpFill" class="hp-fill"></div></div>
+          <span id="l4OppHpText" class="hp-text"></span>
+        </div>
+      </div>
+      <div class="timer-col">
+        <div id="l4Timer" class="timer-num">--</div>
+        <div class="timer-label">TIME</div>
+      </div>
+    </div>
+    <div class="arena arena-combat">
+      <div class="arena-side arena-side-left combat-side">
+        <div id="l4HurtFlash" class="hurt-flash"></div>
+        <div id="l4AvatarBox" class="anim-box">
+          <img id="l4PlayerImg" class="char-img combat-char-img" src="assets/Character_Stand.png" alt="" draggable="false">
+        </div>
+      </div>
+      <div class="arena-center">
+        <canvas id="canvasL4" class="draw-canvas draw-canvas-sm"></canvas>
+        <div class="l4-char-row">
+          <span id="l4PromptLabel" class="l4-prompt-label"></span>
+          <span id="l4CharMain" class="l4-char-main"></span>
+          <span id="l4Py" class="l4-py"></span>
+        </div>
+        <div id="l4Dots" class="dots-row"></div>
+      </div>
+      <div class="arena-side arena-side-right combat-side">
+        <svg viewBox="0 0 120 120" class="windup-ring">
+          <circle cx="60" cy="60" r="54" fill="none" stroke="rgba(42,36,32,.35)" stroke-width="5"/>
+          <circle id="l4Ring" cx="60" cy="60" r="54" fill="none" stroke="#e8b84a" stroke-width="6" stroke-linecap="round" transform="rotate(-90 60 60)" stroke-dasharray="339.29" stroke-dashoffset="339.29"/>
+        </svg>
+        <div id="l4OppBox" class="anim-box opp-box">
+          <img id="l4BossImg" class="char-img opp-img" src="assets/Boss_Stand.png" alt="" draggable="false">
+        </div>
+      </div>
+    </div>
+    <div class="l4-bottom">
+      <div id="l4Guide" class="l4-guide-text"></div>
+    </div>
+  </section>
+
+  <!-- ============ WIN ============ -->
+  <section id="screen-win" class="screen" hidden>
+    <div class="win-bg"></div>
+    <div id="winConfetti" class="confetti-layer"></div>
+    <div class="win-art-wrap">
+      <img id="winImg" class="win-art" src="assets/Character_Winning_1.png" alt="" draggable="false">
+    </div>
+    <div id="winTitle" class="result-title"></div>
+    <div id="winSub" class="result-sub"></div>
+    <div class="result-actions">
+      <button id="btnProceed" class="btn-action btn-proceed" hidden></button>
+      <button id="btnWinHome" class="btn-action btn-home-action"></button>
+    </div>
+  </section>
+
+  <!-- ============ DEFEAT ============ -->
+  <section id="screen-defeat" class="screen" hidden>
+    <div class="defeat-bg"></div>
+    <div class="defeat-art-wrap">
+      <img class="defeat-art" src="assets/Character_Lose.png" alt="" draggable="false">
+    </div>
+    <div id="defeatTitle" class="result-title"></div>
+    <div id="defeatSub" class="result-sub-defeat"></div>
+    <div class="result-actions">
+      <button id="btnRetry" class="btn-action btn-retry"></button>
+      <button id="btnDefeatHome" class="btn-action btn-home-action"></button>
+    </div>
+  </section>
+
+  <!-- ============ PAUSE OVERLAY ============ -->
+  <section id="overlay-pause" class="overlay-pause" hidden>
+    <div class="pause-card">
+      <div id="pauseTitle" class="pause-title"></div>
+      <div id="pauseHint" class="pause-hint"></div>
+      <div id="pauseLangGrid" class="pause-lang-grid"></div>
+      <button id="btnResume" class="pause-resume"></button>
+      <button id="btnPauseHome" class="pause-home"></button>
+    </div>
+  </section>
+
+  <!-- ============ ROTATE BANNER ============ -->
+  <div id="rotateBanner" class="rotate-banner" hidden>🔄 <span id="rotateText"></span></div>
+
+</div>
+<script src="game.js"></script>
+</body>
+</html>
