@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700;900&family=Noto+Sans+SC:wght@400;500;700;900&family=Noto+Serif+TC:wght@500;700;900&family=Noto+Serif+SC:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; height:100%; background:#2a2420; -webkit-tap-highlight-color:transparent; }
+  body{ font-family:'Fredoka',system-ui,sans-serif; overflow:hidden; }
+  @keyframes kfIdle{ 0%,100%{ transform:translateY(0) rotate(0); } 50%{ transform:translateY(-5px) rotate(-1deg); } }
+  @keyframes kfStrikeR{ 0%{ transform:translateX(0) rotate(0); } 32%{ transform:translateX(38px) rotate(-5deg); } 100%{ transform:translateX(0) rotate(0); } }
+  @keyframes kfCritR{ 0%{ transform:translateX(0) scale(1); } 30%{ transform:translateX(54px) scale(1.07) rotate(-7deg); } 100%{ transform:translateX(0) scale(1); } }
+  @keyframes kfStrikeL{ 0%{ transform:scaleX(-1) translateX(0); } 32%{ transform:scaleX(-1) translateX(38px) rotate(5deg); } 100%{ transform:scaleX(-1) translateX(0); } }
+  @keyframes kfFlinch{ 0%{ transform:scaleX(-1) translateX(0); } 28%{ transform:scaleX(-1) translateX(16px) rotate(6deg); } 100%{ transform:scaleX(-1) translateX(0); } }
+  @keyframes kfHurt{ 0%{ transform:translateX(0); } 28%{ transform:translateX(-15px) rotate(5deg); } 100%{ transform:translateX(0); } }
+  @keyframes kfSpin{ 0%{ transform:rotate(0); } 100%{ transform:rotate(360deg); } }
+  @keyframes kfBrushBob{ 0%,100%{ transform:translateY(0) rotate(-8deg); } 50%{ transform:translateY(-10px) rotate(6deg); } }
+  @keyframes kfFlick{ 0%{ opacity:1; } 12%{ opacity:.15; } 26%{ opacity:1; } 62%{ opacity:1; } 76%{ opacity:.15; } 90%{ opacity:1; } }
+  @keyframes kfShake{ 0%,100%{ transform:translateX(0) rotate(0); } 25%{ transform:translateX(4px) rotate(1.5deg); } 75%{ transform:translateX(-4px) rotate(-1.5deg); } }
+  @keyframes kfVictory{ 0%{ transform:translateY(28px) scale(.82); opacity:0; } 60%{ transform:translateY(-6px) scale(1.08); } 100%{ transform:translateY(0) scale(1.04); opacity:1; } }
+  @keyframes kfDefeat{ 0%{ transform:translateY(-8px) rotate(0); opacity:0; } 100%{ transform:translateY(14px) rotate(-7deg); opacity:1; } }
+  @keyframes kfConfetti{ 0%{ transform:translateY(-8vh) rotate(0); } 100%{ transform:translateY(110vh) rotate(680deg); } }
+  @keyframes kfShimmer{ 0%{ opacity:0; transform:translateX(-120%) skewX(-18deg); } 50%{ opacity:.9; } 100%{ opacity:0; transform:translateX(220%) skewX(-18deg); } }
+  @keyframes kfFloat{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(7px); } }
+  @keyframes kfCardFloat{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-9px); } }
+  @keyframes kfPopIn{ 0%{ transform:scale(.86); opacity:0; } 100%{ transform:scale(1); opacity:1; } }
+  @keyframes kfBannerIn{ 0%{ transform:translateY(-120%); } 100%{ transform:translateY(0); } }
+  @keyframes kfGlow{ 0%,100%{ opacity:.35; } 50%{ opacity:.7; } }
+</style>
+</helmet>
+
+<div style="position:fixed; inset:0; color:#2a2420; user-select:none; -webkit-user-select:none; touch-action:manipulation;">
+
+  <!-- ============ LOADING ============ -->
+  <sc-if value="{{ isLoading }}" hint-placeholder-val="{{ true }}">
+    <div style="position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:34px; overflow:hidden; background:radial-gradient(circle at 50% 38%,#3a2c1e,#241a12 70%,#1a120c);">
+      <div style="position:absolute; inset:0; background:radial-gradient(60% 40% at 50% 30%,rgba(232,184,74,.14),transparent 70%); pointer-events:none;"></div>
+      <!-- ensō brush spinner -->
+      <div style="position:relative; width:clamp(120px,20vw,170px); height:clamp(120px,20vw,170px); z-index:2;">
+        <svg viewBox="0 0 100 100" style="width:100%; height:100%; animation:kfSpin 1.5s linear infinite;">
+          <circle cx="50" cy="50" r="40" fill="none" stroke="rgba(245,230,200,.14)" stroke-width="7"/>
+          <circle cx="50" cy="50" r="40" fill="none" stroke="#e8b84a" stroke-width="7" stroke-linecap="round" stroke-dasharray="180 251" transform="rotate(-90 50 50)"/>
+        </svg>
+        <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-family:'Noto Serif TC','Noto Serif SC',serif; font-weight:900; font-size:clamp(38px,6vw,54px); color:#f5e6c8; text-shadow:0 3px 0 rgba(0,0,0,.35);">筆</div>
+      </div>
+      <!-- progress -->
+      <div style="z-index:2; display:flex; flex-direction:column; align-items:center; gap:12px; width:min(74vw,360px);">
+        <div style="font-family:'Noto Serif TC','Noto Serif SC',serif; font-weight:700; font-size:clamp(18px,2.4vw,24px); color:#e8b84a; letter-spacing:3px;">載入中 · Loading</div>
+        <div style="width:100%; height:14px; background:rgba(42,36,32,.6); border:2px solid #8b5a2b; border-radius:8px; overflow:hidden;">
+          <div style="{{ loadBarStyle }}"></div>
+        </div>
+        <div style="font-family:'Fredoka',sans-serif; font-weight:600; font-size:14px; color:#e0cfa0;">{{ loadPctText }}</div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ============ HOME ============ -->
+  <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
+    <div style="position:absolute; inset:0; display:flex; flex-direction:column; overflow:hidden; background:#241c12 url('uploads/Home_background.jpg') center top/cover no-repeat;">
+      <div style="position:absolute; inset:0; background:linear-gradient(to bottom,rgba(20,14,8,0) 40%,rgba(20,14,8,.45) 72%,rgba(20,14,8,.82) 100%); pointer-events:none;"></div>
+
+      <!-- hero character -->
+      <img src="uploads/Character-67a7e11b.png" alt="" draggable="false" style="position:absolute; left:clamp(-60px,-1vw,8px); bottom:0; height:min(80vh,720px); width:auto; z-index:2; pointer-events:none; filter:drop-shadow(0 14px 26px rgba(0,0,0,.55));">
+
+      <!-- top bar -->
+      <div style="position:relative; z-index:20; display:flex; justify-content:space-between; align-items:flex-start; padding:18px 22px;">
+        <button onClick="{{ onToggleMute }}" aria-label="{{ soundLabel }}" style="display:flex; align-items:center; gap:8px; height:44px; padding:0 16px; border:2px solid #c9ad77; border-radius:22px; background:#f5e6c8; color:#5e3a1a; font-family:'Fredoka',sans-serif; font-weight:600; font-size:15px; cursor:pointer; box-shadow:0 3px 0 #c9ad77;">{{ soundIcon }} {{ soundLabel }}</button>
+        <div style="position:relative;">
+          <button onClick="{{ onToggleLangMenu }}" aria-label="{{ currentLangLabel }}" aria-haspopup="true" aria-expanded="{{ langMenuOpen }}" style="display:flex; align-items:center; gap:8px; height:44px; padding:0 16px; border:2px solid #b8862a; border-radius:22px; background:#e8b84a; color:#5e3a1a; font-family:'Noto Sans TC','Noto Sans SC','Fredoka',sans-serif; font-weight:600; font-size:14px; cursor:pointer; box-shadow:0 3px 0 #b8862a; white-space:nowrap;">🌐 {{ currentLangLabel }} <span style="{{ langChevronStyle }}">▾</span></button>
+          <sc-if value="{{ langMenuOpen }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute; top:52px; right:0; z-index:10; display:flex; flex-direction:column; gap:4px; min-width:180px; padding:6px; background:#f5e6c8; border:3px solid #8b5a2b; border-radius:16px; box-shadow:0 10px 28px rgba(0,0,0,.4); animation:kfPopIn .18s ease;">
+              <sc-for list="{{ langButtons }}" as="b" hint-placeholder-count="4">
+                <button onClick="{{ b.onClick }}" aria-label="{{ b.label }}" style="{{ b.menuStyle }}">{{ b.label }}</button>
+              </sc-for>
+            </div>
+          </sc-if>
+        </div>
+      </div>
+
+      <!-- title is part of the background image -->
+
+      <!-- level tiles -->
+      <div style="position:relative; z-index:3; flex:1; display:flex; align-items:center; justify-content:center; gap:clamp(12px,2vw,26px); padding:clamp(170px,30vh,300px) 26px 10px; flex-wrap:wrap;">
+        <sc-for list="{{ tiles }}" as="t" hint-placeholder-count="4">
+          <button onClick="{{ t.onClick }}" aria-label="{{ t.aria }}" style="{{ t.style }}" style-hover="{{ t.style }}">
+            <img src="{{ t.img }}" alt="{{ t.aria }}" draggable="false" style="{{ t.imgStyle }}">
+            <sc-if value="{{ t.locked }}" hint-placeholder-val="{{ false }}">
+              <div style="position:absolute; inset:6% 4%; border-radius:16px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px;">
+                <svg viewBox="0 0 28 30" style="width:34px; height:36px; filter:drop-shadow(0 2px 3px rgba(0,0,0,.5));"><path d="M8 13 V9 a6 6 0 0 1 12 0 V13" fill="none" stroke="#f5e6c8" stroke-width="3"/><rect x="5" y="13" width="18" height="14" rx="3" fill="#f5e6c8"/><circle cx="14" cy="19" r="2.4" fill="#5e3a1a"/></svg>
+                <span style="font-family:'Noto Sans TC','Noto Sans SC',sans-serif; color:#f5e6c8; font-size:13px; font-weight:700; text-shadow:0 2px 3px rgba(0,0,0,.7);">{{ t.lockText }}</span>
+              </div>
+            </sc-if>
+          </button>
+        </sc-for>
+      </div>
+
+      <!-- avatar / trophy removed -->
+    </div>
+  </sc-if>
+
+  <!-- ============ LEVEL 1 ============ -->
+  <sc-if value="{{ isL1 }}" hint-placeholder-val="{{ false }}">
+    <div style="position:absolute; inset:0; display:flex; flex-direction:column; overflow:hidden; background:#241c12 url('uploads/Level_1_Background.jpg') center center/cover no-repeat;">
+      <div style="position:absolute; inset:0; background:linear-gradient(to bottom,rgba(20,14,8,.28) 0%,rgba(20,14,8,0) 30%,rgba(20,14,8,0) 62%,rgba(20,14,8,.4) 100%); pointer-events:none;"></div>
+      <!-- HUD -->
+      <div style="position:relative; z-index:4; display:flex; align-items:center; gap:14px; padding:14px 20px;">
+        <button onClick="{{ onToggleMute }}" aria-label="{{ soundLabel }}" style="width:46px; height:46px; flex:0 0 auto; border:2px solid #c9ad77; border-radius:14px; background:#f5e6c8; color:#5e3a1a; font-size:18px; cursor:pointer; box-shadow:0 3px 0 #c9ad77; display:flex; align-items:center; justify-content:center;">{{ soundIcon }}</button>
+        <button onClick="{{ onTogglePause }}" aria-label="pause" style="width:46px; height:46px; flex:0 0 auto; border:2px solid #c9ad77; border-radius:14px; background:#f5e6c8; color:#5e3a1a; font-size:18px; cursor:pointer; box-shadow:0 3px 0 #c9ad77; display:flex; align-items:center; justify-content:center;">❚❚</button>
+        <div style="margin-left:auto; font-family:'Noto Sans TC','Noto Sans SC','Fredoka',sans-serif; font-weight:700; font-size:clamp(15px,1.8vw,20px); color:#f5e6c8; background:rgba(42,36,32,.4); padding:8px 20px; border-radius:20px;">{{ l1ProgressText }}</div>
+      </div>
+      <!-- arena -->
+      <div style="position:relative; z-index:3; flex:1; display:flex; align-items:center; justify-content:space-between; padding:0 clamp(20px,5vw,80px); gap:18px;">
+        <div style="flex:1 1 0; min-width:0; height:clamp(150px,30vh,250px); display:flex; align-items:flex-end; justify-content:flex-start; transform:translateY(80px);">
+          <div style="{{ avatarAnimStyle }}">
+            <img src="{{ practiceImg }}" alt="" draggable="false" style="height:100%; width:auto; filter:drop-shadow(0 8px 12px rgba(0,0,0,.45));">
+          </div>
+        </div>
+        <div style="flex:0 1 auto; display:flex; flex-direction:column; align-items:center; gap:10px;">
+          <canvas ref="{{ setCanvasRef }}" onPointerDown="{{ onCanvasDown }}" onPointerMove="{{ onCanvasMove }}" onPointerUp="{{ onCanvasUp }}" onPointerCancel="{{ onCanvasCancel }}" style="touch-action:none; -webkit-user-select:none; -webkit-touch-callout:none; user-select:none; width:min(42vh,40vw,440px); height:min(42vh,40vw,440px); background:#fbf3df; border:5px solid #8b5a2b; border-radius:18px; box-shadow:0 10px 0 rgba(0,0,0,.22), inset 0 0 0 2px #e0cfa0; cursor:crosshair;"></canvas>
+          <div style="font-family:'Noto Sans TC','Noto Sans SC','Fredoka',sans-serif; font-weight:600; font-size:clamp(14px,1.7vw,18px); color:#e0cfa0; text-align:center;">{{ l1Guide }}</div>
+        </div>
+        <div style="flex:1 1 0; min-width:0; height:clamp(150px,30vh,250px); display:flex; align-items:center; justify-content:flex-end; transform:translateY(80px);">
+          <div style="{{ dummyAnimStyle }}">
+            <img src="uploads/WoodenDummy-5862f757.png" alt="" draggable="false" style="height:100%; width:auto; filter:drop-shadow(0 8px 12px rgba(0,0,0,.45));">
+          </div>
+        </div>
+      </div>
+      <!-- bottom strip -->
+      <div style="position:relative; z-index:3; text-align:center; padding:12px 20px 22px;">
+        <div style="font-family:'Noto Serif TC','Noto Serif SC',serif; font-weight:900; font-size:clamp(26px,3.4vw,40px); color:#f5e6c8; line-height:1;">{{ strokeMain }}</div>
+        <div style="font-family:'Fredoka',sans-serif; font-weight:500; font-size:clamp(13px,1.5vw,17px); color:#e8b84a; margin-top:4px; letter-spacing:1px;">{{ strokeSub }}</div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ============ LEVEL 2 ============ -->
+  <sc-if value="{{ isL2 }}" hint-placeholder-val="{{ false }}">
+    <div style="position:absolute; inset:0; display:flex; flex-direction:column; overflow:hidden; background:#241c12 url('uploads/Level_2_Background.png') center center/cover no-repeat;">
+      <div style="position:absolute; inset:0; background:linear-gradient(to bottom,rgba(20,14,8,.32) 0%,rgba(20,14,8,0) 34%,rgba(20,14,8,0) 60%,rgba(20,14,8,.44) 100%); pointer-events:none;"></div>
+      <!-- HUD -->
+      <div style="position:relative; z-index:4; display:flex; align-items:flex-start; gap:14px; padding:12px 18px;">
+        <button onClick="{{ onToggleMute }}" aria-label="{{ soundLabel }}" style="width:46px; height:46px; flex:0 0 auto; border:2px solid #c9ad77; border-radius:14px; background:#f5e6c8; color:#5e3a1a; font-size:16px; cursor:pointer; box-shadow:0 3px 0 #c9ad77; display:flex; align-items:center; justify-content:center;">{{ soundIcon }}</button>
+        <button onClick="{{ onTogglePause }}" aria-label="pause" style="width:46px; height:46px; flex:0 0 auto; border:2px solid #c9ad77; border-radius:14px; background:#f5e6c8; color:#5e3a1a; font-size:16px; cursor:pointer; box-shadow:0 3px 0 #c9ad77; display:flex; align-items:center; justify-content:center;">❚❚</button>
+        <div style="flex:1; display:flex; flex-direction:column; gap:7px; max-width:760px; margin:0 auto;">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <span style="font-family:'Noto Sans TC','Noto Sans SC',sans-serif; font-weight:700; font-size:13px; color:#5ba85a; min-width:74px;">{{ avatarLabel }}</span>
+            <div style="flex:1; height:18px; background:rgba(42,36,32,.55); border-radius:9px; overflow:hidden; border:2px solid rgba(0,0,0,.25);"><div style="{{ avatarHpStyle }}"></div></div>
+            <span style="font-family:'Fredoka',sans-serif; font-weight:700; font-size:13px; color:#f5e6c8; min-width:48px; text-align:right;">{{ avatarHpText }}</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <span style="font-family:'Noto Sans TC','Noto Sans SC',sans-serif; font-weight:700; font-size:13px; color:#c0392b; min-width:74px;">{{ oppLabel }}</span>
+            <div style="flex:1; height:18px; background:rgba(42,36,32,.55); border-radius:9px; overflow:hidden; border:2px solid rgba(0,0,0,.25);"><div style="{{ oppHpStyle }}"></div></div>
+            <span style="font-family:'Fredoka',sans-serif; font-weight:700; font-size:13px; color:#f5e6c8; min-width:48px; text-align:right;">{{ oppHpText }}</span>
+          </div>
+        </div>
+        <div style="flex:0 0 auto; display:flex; flex-direction:column; align-items:center;">
+          <div ref="{{ setTimerRef }}" style="font-family:'Fredoka',sans-serif; font-weight:700; font-size:22px; color:#e8b84a; line-height:1;">--</div>
+          <div style="font-size:10px; color:#e0cfa0; letter-spacing:1px;">TIME</div>
+        </div>
+      </div>
+      <!-- arena -->
+      <div style="position:relative; z-index:3; flex:1; display:flex; align-items:center; justify-content:space-between; padding:0 clamp(16px,4vw,70px); gap:14px;">
+        <div style="flex:1 1 0; min-width:0; height:clamp(150px,30vh,250px); display:flex; align-items:flex-end; justify-content:flex-start; position:relative;">
+          <div style="{{ hurtFlashStyle }}"></div>
+          <div style="{{ avatarBoxStyle }}">
+            <img src="{{ playerImg }}" alt="" draggable="false" style="{{ playerImgStyle }}">
+          </div>
+        </div>
+        <div style="flex:0 1 auto; display:flex; flex-direction:column; align-items:center;">
+          <canvas ref="{{ setCanvasRef }}" onPointerDown="{{ onCanvasDown }}" onPointerMove="{{ onCanvasMove }}" onPointerUp="{{ onCanvasUp }}" onPointerCancel="{{ onCanvasCancel }}" style="touch-action:none; -webkit-user-select:none; -webkit-touch-callout:none; user-select:none; width:min(42vh,40vw,440px); height:min(42vh,40vw,440px); background:#fbf3df; border:5px solid #8b5a2b; border-radius:18px; box-shadow:0 10px 0 rgba(0,0,0,.22), inset 0 0 0 2px #e0cfa0; cursor:crosshair;"></canvas>
+          <div style="margin-top:10px; font-family:'Noto Serif TC','Noto Serif SC',serif; font-weight:900; font-size:clamp(20px,2.6vw,32px); color:#f5e6c8; line-height:1;">{{ promptMain }}</div>
+          <div style="margin-top:8px; font-family:'Noto Sans TC','Noto Sans SC','Fredoka',sans-serif; font-weight:600; font-size:clamp(14px,1.7vw,18px); color:#e0cfa0; text-align:center;">{{ l2Guide }}</div>
+        </div>
+        <div style="flex:1 1 0; min-width:0; height:clamp(150px,30vh,250px); display:flex; align-items:center; justify-content:flex-end; position:relative;">
+          <svg viewBox="0 0 120 120" style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:clamp(170px,34vh,290px); height:clamp(170px,34vh,290px); pointer-events:none;"><circle cx="60" cy="60" r="54" fill="none" stroke="rgba(42,36,32,.35)" stroke-width="5"/><circle ref="{{ setRingRef }}" cx="60" cy="60" r="54" fill="none" stroke="#e8b84a" stroke-width="6" stroke-linecap="round" transform="rotate(-90 60 60)" stroke-dasharray="339.29" stroke-dashoffset="339.29"/></svg>
+          <div style="{{ oppBoxStyle }}">
+            <img src="{{ monkImg }}" alt="" draggable="false" style="height:100%; width:auto; transform:scaleX(-1); filter:drop-shadow(0 8px 12px rgba(0,0,0,.45));">
+          </div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ============ LEVEL 3 ============ -->
+  <sc-if value="{{ isL3 }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="Level 3" style="position:absolute; inset:0; display:flex; flex-direction:column; overflow:hidden; background:#241c12 url('uploads/Level_3_Background-57d3e7cc.jpg') center center/cover no-repeat;">
+      <div style="position:absolute; inset:0; background:linear-gradient(to bottom,rgba(20,14,8,.22) 0%,rgba(20,14,8,0) 30%,rgba(20,14,8,0) 62%,rgba(20,14,8,.34) 100%); pointer-events:none;"></div>
+      <!-- HUD -->
+      <div style="position:relative; z-index:4; display:flex; align-items:center; gap:14px; padding:14px 20px;">
+        <button onClick="{{ onToggleMute }}" aria-label="{{ soundLabel }}" style="width:46px; height:46px; flex:0 0 auto; border:2px solid #c9ad77; border-radius:14px; background:#f5e6c8; color:#5e3a1a; font-size:18px; cursor:pointer; box-shadow:0 3px 0 #c9ad77; display:flex; align-items:center; justify-content:center;">{{ soundIcon }}</button>
+        <button onClick="{{ onTogglePause }}" aria-label="pause" style="width:46px; height:46px; flex:0 0 auto; border:2px solid #c9ad77; border-radius:14px; background:#f5e6c8; color:#5e3a1a; font-size:18px; cursor:pointer; box-shadow:0 3px 0 #c9ad77; display:flex; align-items:center; justify-content:center;">❚❚</button>
+        <div style="margin-left:auto; font-family:'Noto Sans TC','Noto Sans SC','Fredoka',sans-serif; font-weight:700; font-size:clamp(15px,1.8vw,20px); color:#f5e6c8; background:rgba(42,36,32,.4); padding:8px 20px; border-radius:20px;">{{ l3Progress }}</div>
+      </div>
+      <!-- arena -->
+      <div style="position:relative; z-index:3; flex:1; display:flex; align-items:center; justify-content:space-between; padding:0 clamp(16px,4vw,70px); gap:14px;">
+        <div style="flex:1 1 0; min-width:0; height:clamp(150px,30vh,250px); display:flex; align-items:flex-end; justify-content:flex-start; transform:translateY(100px);">
+          <div style="{{ avatarAnimStyle }}">
+            <img src="{{ practiceImg }}" alt="" draggable="false" style="height:100%; width:auto; filter:drop-shadow(0 8px 12px rgba(0,0,0,.45));">
+          </div>
+        </div>
+        <div style="flex:0 1 auto; display:flex; flex-direction:column; align-items:center; gap:10px;">
+          <canvas ref="{{ setCanvasRef }}" onPointerDown="{{ onCanvasDown }}" onPointerMove="{{ onCanvasMove }}" onPointerUp="{{ onCanvasUp }}" onPointerCancel="{{ onCanvasCancel }}" style="touch-action:none; -webkit-user-select:none; -webkit-touch-callout:none; user-select:none; width:min(40vh,38vw,420px); height:min(40vh,38vw,420px); background:#fbf3df; border:5px solid #8b5a2b; border-radius:18px; box-shadow:0 10px 0 rgba(0,0,0,.22), inset 0 0 0 2px #e0cfa0; cursor:crosshair;"></canvas>
+          <div style="font-family:'Noto Sans TC','Noto Sans SC','Fredoka',sans-serif; font-weight:600; font-size:clamp(14px,1.7vw,18px); color:#e0cfa0; text-align:center;">{{ l3Guide }}</div>
+        </div>
+        <div style="flex:1 1 0; min-width:0; height:clamp(150px,30vh,250px); display:flex; align-items:center; justify-content:flex-end; transform:translateY(100px);">
+          <div style="{{ dummyAnimStyle }}">
+            <img src="uploads/WoodenDummy-5862f757.png" alt="" draggable="false" style="height:100%; width:auto; filter:drop-shadow(0 8px 12px rgba(0,0,0,.45));">
+          </div>
+        </div>
+      </div>
+      <!-- bottom -->
+      <div style="position:relative; z-index:3; display:flex; flex-direction:column; align-items:center; gap:8px; padding:8px 20px 20px;">
+        <div style="display:flex; align-items:baseline; gap:12px;">
+          <span style="font-family:'Noto Serif TC','Noto Serif SC',serif; font-weight:900; font-size:clamp(28px,3.6vw,42px); color:#f5e6c8; line-height:1;">{{ l3CharMain }}</span>
+          <span style="font-family:'Fredoka',sans-serif; font-weight:500; font-size:clamp(14px,1.6vw,18px); color:#e8b84a;">{{ l3Py }}</span>
+          <span style="font-family:'Fredoka',sans-serif; font-weight:500; font-size:clamp(13px,1.4vw,16px); color:#e0cfa0; opacity:.85;">{{ l3Meaning }}</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-family:'Noto Sans TC','Noto Sans SC',sans-serif; font-size:12px; color:#e0cfa0; opacity:.75; letter-spacing:1px;">{{ l3OrderLabel }}</span>
+          <sc-for list="{{ l3Dots }}" as="d" hint-placeholder-count="3">
+            <div style="{{ d.style }}">{{ d.num }}</div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ============ LEVEL 4 ============ -->
+  <sc-if value="{{ isL4 }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="Level 4" style="position:absolute; inset:0; display:flex; flex-direction:column; overflow:hidden; background:#241016 url('uploads/Level_4_Background-b5e4e2ab.png') center center/cover no-repeat;">
+      <div style="position:absolute; inset:0; background:linear-gradient(to bottom,rgba(20,10,12,.32) 0%,rgba(20,10,12,0) 34%,rgba(20,10,12,0) 60%,rgba(20,10,12,.44) 100%); pointer-events:none;"></div>
+      <!-- HUD -->
+      <div style="position:relative; z-index:4; display:flex; align-items:flex-start; gap:14px; padding:12px 18px;">
+        <button onClick="{{ onToggleMute }}" aria-label="{{ soundLabel }}" style="width:46px; height:46px; flex:0 0 auto; border:2px solid #c9ad77; border-radius:14px; background:#f5e6c8; color:#5e3a1a; font-size:16px; cursor:pointer; box-shadow:0 3px 0 #c9ad77; display:flex; align-items:center; justify-content:center;">{{ soundIcon }}</button>
+        <button onClick="{{ onTogglePause }}" aria-label="pause" style="width:46px; height:46px; flex:0 0 auto; border:2px solid #c9ad77; border-radius:14px; background:#f5e6c8; color:#5e3a1a; font-size:16px; cursor:pointer; box-shadow:0 3px 0 #c9ad77; display:flex; align-items:center; justify-content:center;">❚❚</button>
+        <div style="flex:1; display:flex; flex-direction:column; gap:7px; max-width:760px; margin:0 auto;">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <span style="font-family:'Noto Sans TC','Noto Sans SC',sans-serif; font-weight:700; font-size:13px; color:#5ba85a; min-width:74px;">{{ avatarLabel }}</span>
+            <div style="flex:1; height:18px; background:rgba(42,36,32,.55); border-radius:9px; overflow:hidden; border:2px solid rgba(0,0,0,.25);"><div style="{{ avatarHpStyle }}"></div></div>
+            <span style="font-family:'Fredoka',sans-serif; font-weight:700; font-size:13px; color:#f5e6c8; min-width:48px; text-align:right;">{{ avatarHpText }}</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <span style="font-family:'Noto Sans TC','Noto Sans SC',sans-serif; font-weight:700; font-size:13px; color:#c0392b; min-width:74px;">{{ oppLabel }}</span>
+            <div style="flex:1; height:18px; background:rgba(42,36,32,.55); border-radius:9px; overflow:hidden; border:2px solid rgba(0,0,0,.25);"><div style="{{ oppHpStyle }}"></div></div>
+            <span style="font-family:'Fredoka',sans-serif; font-weight:700; font-size:13px; color:#f5e6c8; min-width:48px; text-align:right;">{{ oppHpText }}</span>
+          </div>
+        </div>
+        <div style="flex:0 0 auto; display:flex; flex-direction:column; align-items:center;">
+          <div ref="{{ setTimerRef }}" style="font-family:'Fredoka',sans-serif; font-weight:700; font-size:22px; color:#e8b84a; line-height:1;">--</div>
+          <div style="font-size:10px; color:#e0cfa0; letter-spacing:1px;">TIME</div>
+        </div>
+      </div>
+      <!-- arena -->
+      <div style="position:relative; z-index:3; flex:1; display:flex; align-items:center; justify-content:space-between; padding:0 clamp(16px,4vw,70px); gap:14px;">
+        <div style="flex:1 1 0; min-width:0; height:clamp(150px,30vh,250px); display:flex; align-items:flex-end; justify-content:flex-start; position:relative;">
+          <div style="{{ hurtFlashStyle }}"></div>
+          <div style="{{ avatarBoxStyle }}">
+            <img src="{{ playerImg }}" alt="" draggable="false" style="{{ playerImgStyle }}">
+          </div>
+        </div>
+        <div style="flex:0 1 auto; display:flex; flex-direction:column; align-items:center;">
+          <canvas ref="{{ setCanvasRef }}" onPointerDown="{{ onCanvasDown }}" onPointerMove="{{ onCanvasMove }}" onPointerUp="{{ onCanvasUp }}" onPointerCancel="{{ onCanvasCancel }}" style="touch-action:none; -webkit-user-select:none; -webkit-touch-callout:none; user-select:none; width:min(40vh,38vw,420px); height:min(40vh,38vw,420px); background:#fbf3df; border:5px solid #8b5a2b; border-radius:18px; box-shadow:0 10px 0 rgba(0,0,0,.22), inset 0 0 0 2px #e0cfa0; cursor:crosshair;"></canvas>
+          <div style="display:flex; align-items:baseline; gap:10px; margin-top:10px;">
+            <span style="font-family:'Noto Sans TC','Noto Sans SC','Fredoka',sans-serif; font-weight:500; font-size:clamp(13px,1.5vw,17px); color:#e8b84a;">{{ l4Prompt }}</span>
+            <span style="font-family:'Noto Sans TC','Noto Sans SC',sans-serif; font-weight:900; font-size:clamp(26px,3.2vw,38px); color:#f5e6c8; line-height:1;">{{ l4CharMain }}</span>
+            <span style="font-family:'Fredoka',sans-serif; font-weight:500; font-size:clamp(13px,1.5vw,17px); color:#e0cfa0; opacity:.85;">{{ l4Py }}</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px; margin-top:9px;">
+            <sc-for list="{{ l4Dots }}" as="d" hint-placeholder-count="3">
+              <div style="{{ d.style }}">{{ d.num }}</div>
+            </sc-for>
+          </div>
+        </div>
+        <div style="flex:1 1 0; min-width:0; height:clamp(150px,30vh,250px); display:flex; align-items:center; justify-content:flex-end; position:relative;">
+          <svg viewBox="0 0 120 120" style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:clamp(170px,34vh,290px); height:clamp(170px,34vh,290px); pointer-events:none;"><circle cx="60" cy="60" r="54" fill="none" stroke="rgba(42,36,32,.35)" stroke-width="5"/><circle ref="{{ setRingRef }}" cx="60" cy="60" r="54" fill="none" stroke="#e8b84a" stroke-width="6" stroke-linecap="round" transform="rotate(-90 60 60)" stroke-dasharray="339.29" stroke-dashoffset="339.29"/></svg>
+          <div style="{{ oppBoxStyle }}">
+            <img src="{{ bossImg }}" alt="" draggable="false" style="height:100%; width:auto; transform:scaleX(-1); filter:drop-shadow(0 8px 12px rgba(0,0,0,.45));">
+          </div>
+        </div>
+      </div>
+      <!-- bottom -->
+      <div style="position:relative; z-index:3; text-align:center; padding:6px 20px 18px;">
+        <div style="font-family:'Noto Sans TC','Noto Sans SC','Fredoka',sans-serif; font-weight:500; font-size:13px; color:#e0cfa0; opacity:.8;">{{ l4Guide }}</div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ============ WIN ============ -->
+  <sc-if value="{{ isWin }}" hint-placeholder-val="{{ false }}">
+    <div style="position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; overflow:hidden; background:radial-gradient(circle at 50% 38%,#7a5430,#46341f 70%,#2a2017);">
+      <div style="position:absolute; inset:0; pointer-events:none;">{{ confetti }}</div>
+      <div style="position:relative; z-index:2; height:clamp(150px,26vh,230px); animation:kfVictory .7s cubic-bezier(.2,.8,.3,1.2) both;">
+        <sc-if value="{{ showWinImg }}" hint-placeholder-val="{{ false }}">
+          <img src="uploads/Character_Winning_1.png" alt="" draggable="false" style="height:100%; width:auto; filter:drop-shadow(0 12px 18px rgba(0,0,0,.5));">
+        </sc-if>
+        <sc-if value="{{ showTrophyImg }}" hint-placeholder-val="{{ false }}">
+          <img src="uploads/Character_Winning_2-08d59a63.png" alt="" draggable="false" style="height:100%; width:auto; filter:drop-shadow(0 12px 18px rgba(0,0,0,.5));">
+        </sc-if>
+        <sc-if value="{{ showWinSvg }}" hint-placeholder-val="{{ true }}">
+        <svg viewBox="0 0 120 180" style="height:100%;"><ellipse cx="60" cy="172" rx="34" ry="7" fill="rgba(0,0,0,.22)"/><rect x="44" y="114" width="14" height="54" rx="7" fill="#2a2420"/><rect x="62" y="114" width="14" height="54" rx="7" fill="#2a2420"/><path d="M38 70 Q60 60 82 70 L88 122 Q60 132 32 122 Z" fill="#3a322c"/><rect x="33" y="107" width="54" height="12" rx="3" fill="#c0392b"/><rect x="20" y="42" width="13" height="40" rx="6" fill="#3a322c" transform="rotate(-28 26 62)"/><rect x="87" y="42" width="13" height="40" rx="6" fill="#3a322c" transform="rotate(28 94 62)"/><circle cx="18" cy="40" r="8.5" fill="#2a2420"/><circle cx="102" cy="40" r="8.5" fill="#2a2420"/><circle cx="60" cy="48" r="20" fill="#2a2420"/><rect x="38" y="37" width="44" height="9" rx="2" fill="#c0392b"/><path d="M80 41 L98 36 L95 49 Z" fill="#c0392b"/></svg>
+        </sc-if>
+      </div>
+      <div style="position:relative; z-index:2; font-family:'Noto Sans TC','Noto Sans SC','Fredoka',sans-serif; font-weight:900; font-size:clamp(36px,6vw,68px); color:#e8b84a; text-shadow:0 4px 0 rgba(0,0,0,.3); margin-top:10px;">{{ winTitle }}</div>
+      <div style="position:relative; z-index:2; font-family:'Noto Sans TC','Noto Sans SC',sans-serif; font-weight:600; font-size:clamp(15px,2vw,22px); color:#f5e6c8; margin-top:6px;">{{ winSub }}</div>
+      <div style="position:relative; z-index:2; display:flex; gap:16px; margin-top:30px; flex-wrap:wrap; justify-content:center;">
+        <sc-if value="{{ winHasNext }}" hint-placeholder-val="{{ false }}">
+          <button onClick="{{ onProceed }}" style="height:54px; padding:0 30px; border:none; border-radius:27px; background:#c0392b; color:#fff; font-family:'Noto Sans TC','Noto Sans SC','Fredoka',sans-serif; font-weight:700; font-size:17px; cursor:pointer; box-shadow:0 4px 0 #8e2a1f;">{{ proceedLabel }}</button>
+        </sc-if>
+        <button onClick="{{ onHome }}" style="height:54px; padding:0 30px; border:none; border-radius:27px; background:#f5e6c8; color:#5e3a1a; font-family:'Noto Sans TC','Noto Sans SC','Fredoka',sans-serif; font-weight:700; font-size:17px; cursor:pointer; box-shadow:0 4px 0 #b8862a;">{{ homeLabel }}</button>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ============ DEFEAT ============ -->
+  <sc-if value="{{ isDefeat }}" hint-placeholder-val="{{ false }}">
+    <div style="position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; overflow:hidden; background:radial-gradient(circle at 50% 42%,#46341f,#2e2218 72%,#221a14);">
+      <div style="height:clamp(150px,26vh,230px); animation:kfDefeat .6s ease both;">
+        <img src="uploads/Character_Lose.png" alt="" draggable="false" style="height:100%; width:auto; filter:drop-shadow(0 12px 18px rgba(0,0,0,.5));">
+      </div>
+      <div style="font-family:'Noto Sans TC','Noto Sans SC','Fredoka',sans-serif; font-weight:900; font-size:clamp(30px,5vw,56px); color:#e8b84a; text-shadow:0 4px 0 rgba(0,0,0,.3); margin-top:14px;">{{ defeatTitle }}</div>
+      <div style="font-family:'Fredoka',sans-serif; font-weight:500; font-size:clamp(13px,1.6vw,18px); color:#e0cfa0; margin-top:6px;">{{ defeatSub }}</div>
+      <div style="display:flex; gap:16px; margin-top:30px; flex-wrap:wrap; justify-content:center;">
+        <button onClick="{{ onRetry }}" style="height:54px; padding:0 30px; border:none; border-radius:27px; background:#4a9878; color:#fff; font-family:'Noto Sans TC','Noto Sans SC','Fredoka',sans-serif; font-weight:700; font-size:17px; cursor:pointer; box-shadow:0 4px 0 #2e7058;">{{ retryLabel }}</button>
+        <button onClick="{{ onHome }}" style="height:54px; padding:0 30px; border:none; border-radius:27px; background:#f5e6c8; color:#5e3a1a; font-family:'Noto Sans TC','Noto Sans SC','Fredoka',sans-serif; font-weight:700; font-size:17px; cursor:pointer; box-shadow:0 4px 0 #b8862a;">{{ homeLabel }}</button>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ============ PAUSE OVERLAY ============ -->
+  <sc-if value="{{ isPaused }}" hint-placeholder-val="{{ false }}">
+    <div style="position:absolute; inset:0; z-index:20; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,.55);">
+      <div style="width:min(440px,90vw); background:#f5e6c8; border:5px solid #8b5a2b; border-radius:22px; padding:26px 26px 28px; text-align:center; box-shadow:0 14px 40px rgba(0,0,0,.4); animation:kfPopIn .25s ease;">
+        <div style="font-family:'Noto Sans TC','Noto Sans SC','Fredoka',sans-serif; font-weight:900; font-size:30px; color:#5e3a1a;">{{ pauseTitle }}</div>
+        <div style="font-family:'Fredoka',sans-serif; font-size:13px; color:#8b5a2b; margin-top:2px; letter-spacing:1px;">{{ pauseHint }}</div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:20px 0 22px;">
+          <sc-for list="{{ langButtons }}" as="b" hint-placeholder-count="4">
+            <button onClick="{{ b.onClick }}" style="{{ b.pauseStyle }}">{{ b.label }}</button>
+          </sc-for>
+        </div>
+        <button onClick="{{ onResume }}" style="width:100%; height:52px; border:none; border-radius:26px; background:#c0392b; color:#fff; font-family:'Noto Sans TC','Noto Sans SC','Fredoka',sans-serif; font-weight:700; font-size:17px; cursor:pointer; box-shadow:0 4px 0 #8e2a1f; margin-bottom:11px;">{{ resumeLabel }}</button>
+        <button onClick="{{ onHome }}" style="width:100%; height:48px; border:2px solid #8b5a2b; border-radius:24px; background:transparent; color:#5e3a1a; font-family:'Noto Sans TC','Noto Sans SC','Fredoka',sans-serif; font-weight:600; font-size:15px; cursor:pointer;">{{ homeLabel }}</button>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ============ ROTATE BANNER ============ -->
+  <sc-if value="{{ showRotate }}" hint-placeholder-val="{{ false }}">
+    <div style="position:absolute; top:0; left:0; right:0; z-index:30; display:flex; align-items:center; justify-content:center; gap:10px; padding:10px 16px; background:rgba(42,36,32,.92); color:#f5e6c8; font-family:'Noto Sans TC','Noto Sans SC','Fredoka',sans-serif; font-size:14px; font-weight:600; animation:kfBannerIn .4s ease;">🔄 {{ rotateText }}</div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  // ---------- static data ----------
+  LANGS = [
+    { id:'trad-canto', label:'繁體中文 (粵語)', written:'traditional', voice:'zh-HK' },
+    { id:'trad-mando', label:'繁體中文 (國語)', written:'traditional', voice:'zh-TW' },
+    { id:'simp-mando', label:'简体中文',        written:'simplified',  voice:'zh-CN' },
+    { id:'english',    label:'English',         written:'english',     voice:'en-US' }
+  ];
+  STROKES = [
+    { id:'heng', t:{traditional:'橫',simplified:'横',english:'Horizontal'}, py:'héng', path:[[18,48],[82,52]] },
+    { id:'shu',  t:{traditional:'豎',simplified:'竖',english:'Vertical'},   py:'shù',  path:[[50,16],[52,84]] },
+    { id:'dian', t:{traditional:'點',simplified:'点',english:'Dot'},        py:'diǎn', path:[[43,38],[58,55]] },
+    { id:'pie',  t:{traditional:'撇',simplified:'撇',english:'Left-falling'},py:'piě', path:[[68,22],[30,78]] },
+    { id:'na',   t:{traditional:'捺',simplified:'捺',english:'Right-falling'},py:'nà', path:[[34,24],[70,76]] },
+    { id:'ti',   t:{traditional:'提',simplified:'提',english:'Rising'},     py:'tí',   path:[[28,74],[72,40]] },
+    { id:'gou',  t:{traditional:'鉤',simplified:'钩',english:'Hook'},       py:'gōu',  path:[[52,18],[52,68],[36,60]] },
+    { id:'zhe',  t:{traditional:'折',simplified:'折',english:'Bend'},       py:'zhé',  path:[[28,30],[72,28],[70,74]] }
+  ];
+  LEVELS = {
+    1:{ name:{traditional:'基礎訓練',simplified:'基础训练',english:'Foundation Training'} },
+    2:{ name:{traditional:'對戰演武',simplified:'对战演武',english:'Sparring Match'} },
+    3:{ name:{traditional:'筆順修煉',simplified:'笔顺修炼',english:'Sequence Training'} },
+    4:{ name:{traditional:'終極對決',simplified:'终极对决',english:'Character Combat'} }
+  };
+  LABELS = {
+    title:{traditional:'《筆畫功夫》',simplified:'《笔画功夫》',english:'Stroke Kung Fu'},
+    soundOn:{traditional:'音效',simplified:'音效',english:'Sound'},
+    pause:{traditional:'暫停',simplified:'暂停',english:'Paused'},
+    pauseHint:{traditional:'切換語言不會重置進度',simplified:'切换语言不会重置进度',english:'Switching language keeps your progress'},
+    resume:{traditional:'繼續遊戲',simplified:'继续游戏',english:'Resume'},
+    home:{traditional:'回到主頁',simplified:'回到主页',english:'Back to Home'},
+    proceed:{traditional:'前往下一關',simplified:'前往下一关',english:'Proceed'},
+    retry:{traditional:'重新挑戰',simplified:'重新挑战',english:'Retry'},
+    victory:{traditional:'勝利！',simplified:'胜利！',english:'Victory!'},
+    keep:{traditional:'再接再厲！',simplified:'再接再厉！',english:'Keep Training!'},
+    keepSub:{traditional:'失敗也是修煉的一部分',simplified:'失败也是修炼的一部分',english:'Losing is part of training'},
+    strokeWord:{traditional:'筆畫',simplified:'笔画',english:'Stroke'},
+    guided:{traditional:'跟著虛線描繪',simplified:'跟着虚线描绘',english:'Trace the dotted path'},
+    free:{traditional:'現在自己寫一次',simplified:'现在自己写一次',english:'Now write it yourself'},
+    avatar:{traditional:'我方',simplified:'我方',english:'You'},
+    master:{traditional:'對手',simplified:'对手',english:'Rival'},
+    grandmaster:{traditional:'宗師',simplified:'宗师',english:'Grandmaster'},
+    charWord:{traditional:'字',simplified:'字',english:'Char'},
+    strokeOrder:{traditional:'筆順',simplified:'笔顺',english:'Order'},
+    l3Guide:{traditional:'依筆順描繪每一筆',simplified:'依笔顺描绘每一笔',english:'Trace each stroke in order'},
+    writePrompt:{traditional:'寫出',simplified:'写出',english:'Write'},
+    l4Guide:{traditional:'寫完整個字即可出招',simplified:'写完整个字即可出招',english:'Finish the character to strike'},
+    l2Guide:{traditional:'寫出筆畫即可出招',simplified:'写出笔画即可出招',english:'Write the stroke to strike'},
+    complete:{traditional:'完成',simplified:'完成',english:'Complete'},
+    locked2:{traditional:'通過第一關解鎖',simplified:'通过第一关解锁',english:'Clear Level 1'},
+    locked3:{traditional:'通過第二關解鎖',simplified:'通过第二关解锁',english:'Clear Level 2'},
+    locked4:{traditional:'通過第三關解鎖',simplified:'通过第三关解锁',english:'Clear Level 3'},
+    soon:{traditional:'即將推出',simplified:'即将推出',english:'Coming Soon'},
+    rotate:{traditional:'橫向遊玩體驗更佳',simplified:'横向游玩体验更佳',english:'Rotate for the best experience'},
+    trophy:{traditional:'全部完成！',simplified:'全部完成！',english:'All Complete!'},
+    lvlword:{traditional:'第',simplified:'第',english:'Level '},
+    lvlword2:{traditional:'關',simplified:'关',english:''}
+  };
+  CN = ['一','二','三','四'];
+  // Multi-stroke characters with strokes listed in correct stroke order (筆順)
+  CHARS_L3 = [
+    { t:{traditional:'二',simplified:'二'}, py:'èr',  en:'two',   strokes:[ [[26,38],[74,38]], [[20,66],[80,66]] ] },
+    { t:{traditional:'十',simplified:'十'}, py:'shí', en:'ten',   strokes:[ [[20,46],[80,46]], [[50,18],[50,84]] ] },
+    { t:{traditional:'三',simplified:'三'}, py:'sān', en:'three', strokes:[ [[28,28],[72,28]], [[24,50],[76,50]], [[18,72],[82,72]] ] },
+    { t:{traditional:'土',simplified:'土'}, py:'tǔ',  en:'earth', strokes:[ [[34,34],[66,34]], [[50,16],[50,72]], [[20,72],[80,72]] ] },
+    { t:{traditional:'王',simplified:'王'}, py:'wáng',en:'king',  strokes:[ [[28,28],[72,28]], [[32,50],[68,50]], [[50,28],[50,76]], [[22,76],[78,76]] ] }
+  ];
+  CHARS_L4 = [
+    { t:{traditional:'人',simplified:'人'}, py:'rén', en:'person',strokes:[ [[52,22],[26,82]], [[50,34],[80,82]] ] },
+    { t:{traditional:'大',simplified:'大'}, py:'dà',  en:'big',   strokes:[ [[22,40],[78,40]], [[50,24],[22,82]], [[50,48],[80,82]] ] },
+    { t:{traditional:'工',simplified:'工'}, py:'gōng',en:'work',  strokes:[ [[30,30],[70,30]], [[50,30],[50,70]], [[24,70],[76,70]] ] },
+    { t:{traditional:'土',simplified:'土'}, py:'tǔ',  en:'earth', strokes:[ [[34,34],[66,34]], [[50,16],[50,72]], [[20,72],[80,72]] ] },
+    { t:{traditional:'王',simplified:'王'}, py:'wáng',en:'king',  strokes:[ [[28,28],[72,28]], [[32,50],[68,50]], [[50,28],[50,76]], [[22,76],[78,76]] ] },
+    { t:{traditional:'木',simplified:'木'}, py:'mù',  en:'wood',  strokes:[ [[22,42],[78,42]], [[50,20],[50,84]], [[48,46],[22,82]], [[52,46],[80,82]] ] }
+  ];
+
+  state = {
+    screen:'home', paused:false, langId:'trad-mando', muted:false, showRotate:false, langMenuOpen:false, loading:true, loadProgress:0,
+    levelsWon:[],
+    strokeIndex:0, phase:'guided',
+    charIndex:0, charStrokeIndex:0,
+    avatarHP:20, opponentHP:20, promptStrokeId:null,
+    avatarAnim:'', opponentAnim:'', dummyAnim:'', hurt:0, blocking:false, attacking:false, bossAttacking:false, bossBlocking:false,
+    winLevel:1, defeatLevel:2, justUnlocked:0
+  };
+
+  // ---------- lifecycle ----------
+  componentDidMount(){
+    try{ const s=JSON.parse(localStorage.getItem('skf_save')||'{}');
+      if(s.langId) this.state.langId=s.langId;
+      if(typeof s.muted==='boolean') this.state.muted=s.muted;
+      if(Array.isArray(s.levelsWon)) this.state.levelsWon=s.levelsWon;
+      this.parentMetrics=s.parentMetrics||{levels:{},strokes:{}};
+    }catch(e){ this.parentMetrics={levels:{},strokes:{}}; }
+    this.forceUpdate();
+    this._mq = window.matchMedia('(orientation: portrait)');
+    const upd=()=>this.setState({showRotate:this._mq.matches});
+    this._mqUpd=upd; this._mq.addEventListener('change',upd); upd();
+    if(window.speechSynthesis) window.speechSynthesis.getVoices();
+    this.preloadAssets();
+  }
+  preloadAssets(){
+    const assets=[
+      'uploads/Home_background.jpg','uploads/Character-67a7e11b.png',
+      'uploads/Home_level_1_button.png','uploads/Home_level_2_button.png','uploads/Home_level_3_button.png','uploads/Home_level_4_button.png',
+      'uploads/Level_1_Background.jpg','uploads/Level_2_Background.png','uploads/Level_3_Background-57d3e7cc.jpg','uploads/Level_4_Background-b5e4e2ab.png',
+      'uploads/WoodenDummy-5862f757.png',
+      'uploads/Character_Stand.png','uploads/Character_Attack-850893fd.png','uploads/Character_Block.png',
+      'uploads/Character_Winning_1.png','uploads/Character_Winning_2-08d59a63.png','uploads/Character_Lose.png',
+      'uploads/Boss_Stand-6eded0c0.png','uploads/Boss_Attack-2f426770.png','uploads/Boss_Block.png',
+      'uploads/Monk_Stand.png','uploads/Monk_Punch.png','uploads/Monk_Block.png'
+    ];
+    const total=assets.length; let done=0; const t0=Date.now();
+    const bump=()=>{ done++; this.setState({loadProgress:done/total}); if(done>=total) finish(); };
+    const finish=()=>{ const wait=Math.max(0,700-(Date.now()-t0)); setTimeout(()=>this.setState({loading:false,loadProgress:1}),wait); };
+    assets.forEach(src=>{ const im=new Image(); im.onload=bump; im.onerror=bump; im.src=src; });
+    // safety: never hang on the loader
+    this._loadGuard=setTimeout(()=>{ if(this.state.loading) this.setState({loading:false,loadProgress:1}); },8000);
+  }
+  componentWillUnmount(){ this.stopTick(); this.stopMusic(); if(this._mq) this._mq.removeEventListener('change',this._mqUpd); clearTimeout(this._loadGuard); }
+
+  persist(){ try{ localStorage.setItem('skf_save', JSON.stringify({langId:this.state.langId,muted:this.state.muted,levelsWon:this.state.levelsWon,parentMetrics:this.parentMetrics})); }catch(e){} }
+
+  lang(){ return this.LANGS.find(l=>l.id===this.state.langId)||this.LANGS[1]; }
+  written(){ return this.lang().written; }
+  L(key){ const m=this.LABELS[key]; return m?m[this.written()]:key; }
+  strokeName(s){ return this.written()==='english'?s.t.english:s.t[this.written()]; }
+  levelName(n){ const nm=this.LEVELS[n].name; return this.written()==='english'?nm.english:nm[this.written()]; }
+
+  // =========================================================
+  //  AUDIO
+  // =========================================================
+  ensureAudio(){
+    if(!this.ac){ try{ this.ac=new (window.AudioContext||window.webkitAudioContext)(); this.master=this.ac.createGain(); this.master.gain.value=this.state.muted?0:0.9; this.master.connect(this.ac.destination);}catch(e){} }
+    if(this.ac&&this.ac.state==='suspended') this.ac.resume();
+  }
+  applyMute(){ if(this.master) this.master.gain.value=this.state.muted?0:0.9; }
+  tone(freq,dur,type,gain,t0,glideTo){
+    if(!this.ac||this.state.muted) return;
+    const t=t0||this.ac.currentTime; const o=this.ac.createOscillator(); const g=this.ac.createGain();
+    o.type=type||'sine'; o.frequency.setValueAtTime(freq,t);
+    if(glideTo) o.frequency.exponentialRampToValueAtTime(glideTo,t+dur);
+    g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(gain||0.18,t+0.012);
+    g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+    o.connect(g); g.connect(this.master); o.start(t); o.stop(t+dur+0.03);
+  }
+  noise(dur,gain,filtHz,t0){
+    if(!this.ac||this.state.muted) return;
+    const t=t0||this.ac.currentTime; const n=Math.floor(this.ac.sampleRate*dur);
+    const buf=this.ac.createBuffer(1,n,this.ac.sampleRate); const d=buf.getChannelData(0);
+    for(let i=0;i<n;i++) d[i]=(Math.random()*2-1)*(1-i/n);
+    const src=this.ac.createBufferSource(); src.buffer=buf;
+    const f=this.ac.createBiquadFilter(); f.type='bandpass'; f.frequency.value=filtHz||1400; f.Q.value=0.8;
+    const g=this.ac.createGain(); g.gain.value=gain||0.2;
+    src.connect(f); f.connect(g); g.connect(this.master); src.start(t);
+  }
+  pop(){ this.ensureAudio(); this.tone(520,0.08,'triangle',0.12); }
+  hit(){ this.noise(0.09,0.32,1700); this.tone(180,0.12,'square',0.16); }
+  criticalHit(){ this.ensureAudio(); if(!this.ac) return; const b=this.ac.currentTime;
+    // deep impact thud
+    this.noise(0.16,0.42,1600,b); this.tone(150,0.22,'square',0.22,b,70);
+    // metallic sweep up
+    this.tone(330,0.28,'sawtooth',0.16,b+0.02,1760);
+    // bright sparkle arpeggio — the signature crit flourish
+    [880,1175,1568,2093].forEach((f,i)=>this.tone(f,0.2,'triangle',0.13,b+0.06+i*0.05));
+    // shimmer tail
+    this.tone(2637,0.3,'sine',0.08,b+0.24); }
+  missImpact(){ this.tone(110,0.22,'sine',0.24,null,70); this.noise(0.14,0.18,500); }
+  dummyHit(){ this.tone(760,0.1,'triangle',0.18,null,520); this.noise(0.04,0.16,2400); }
+  traceRetry(){ this.ensureAudio(); this.tone(330,0.1,'sine',0.09); }
+  victoryStinger(){ this.ensureAudio(); const b=this.ac?this.ac.currentTime:0; [523,659,784,1047].forEach((f,i)=>this.tone(f,0.3,'triangle',0.16,b+i*0.12)); }
+  trophyStinger(){ this.ensureAudio(); const b=this.ac?this.ac.currentTime:0; [523,659,784,1047,1319].forEach((f,i)=>this.tone(f,0.34,'triangle',0.16,b+i*0.12)); this.tone(98,0.9,'sine',0.22,b+0.5); }
+  defeatStinger(){ this.ensureAudio(); const b=this.ac?this.ac.currentTime:0; [440,392,330].forEach((f,i)=>this.tone(f,0.3,'sine',0.15,b+i*0.16)); }
+  levelUnlockChime(){ this.ensureAudio(); const b=this.ac?this.ac.currentTime:0; [784,1047,1319].forEach((f,i)=>this.tone(f,0.22,'sine',0.12,b+i*0.07)); }
+  pauseToggle(){ this.ensureAudio(); this.noise(0.18,0.1,900); }
+  languageSwitchConfirm(){ this.ensureAudio(); const b=this.ac?this.ac.currentTime:0; this.tone(660,0.1,'sine',0.1,b); this.tone(880,0.12,'sine',0.1,b+0.09); }
+
+  startMusic(kind){
+    this.ensureAudio(); this.stopMusic(); if(!this.ac) return;
+    this.musicKind=kind; let step=0;
+    const penta=[262,294,330,392,440];
+    this.musicTimer=setInterval(()=>{
+      if(this.state.muted||this.state.paused) { step++; return; }
+      const t=this.ac.currentTime;
+      if(kind==='train'){
+        const f=penta[step%penta.length]; this.tone(f,0.42,'sine',0.05,t);
+        if(step%4===0) this.tone(f/2,0.5,'triangle',0.04,t);
+      } else {
+        this.noise(0.07,this.intensified?0.16:0.1,step%2?2600:900,t);
+        if(step%2===0) this.tone(this.intensified?78:65,0.18,'sine',0.08,t);
+        if(step%8===4) this.noise(0.1,0.12,400,t);
+      }
+      step++;
+    }, kind==='train'?420:260);
+  }
+  stopMusic(){ if(this.musicTimer){ clearInterval(this.musicTimer); this.musicTimer=null; } this.intensified=false; }
+  intensify(){ if(!this.intensified){ this.intensified=true; } }
+
+  speakStrokeName(s){
+    if(this.state.muted||!window.speechSynthesis) return;
+    try{ window.speechSynthesis.cancel();
+      const lang=this.lang().voice;
+      const text=this.written()==='english'?s.t.english:s.t[this.written()];
+      const u=new SpeechSynthesisUtterance(text); u.lang=lang; u.rate=0.85;
+      const vs=window.speechSynthesis.getVoices();
+      const v=vs.find(x=>x.lang&&x.lang.toLowerCase()===lang.toLowerCase())||vs.find(x=>x.lang&&x.lang.toLowerCase().startsWith(lang.slice(0,2)));
+      if(v) u.voice=v;
+      window.speechSynthesis.speak(u);
+    }catch(e){}
+  }
+
+  // =========================================================
+  //  GEOMETRY / VALIDATION
+  // =========================================================
+  resample(path,n){
+    const pts=path.map(p=>({x:p[0],y:p[1]})); let total=0; const segs=[];
+    for(let i=0;i<pts.length-1;i++){ const d=Math.hypot(pts[i+1].x-pts[i].x,pts[i+1].y-pts[i].y); segs.push(d); total+=d; }
+    const out=[]; for(let k=0;k<=n;k++){ let dist=total*k/n,i=0; while(i<segs.length&&dist>segs[i]){ dist-=segs[i]; i++; } if(i>=segs.length) i=segs.length-1; const r=segs[i]?dist/segs[i]:0; out.push({x:pts[i].x+(pts[i+1].x-pts[i].x)*r,y:pts[i].y+(pts[i+1].y-pts[i].y)*r}); }
+    return out;
+  }
+  coverage(samples,user,r){ let c=0; for(const s of samples){ for(const u of user){ if(Math.hypot(s.x-u.x,s.y-u.y)<=r){ c++; break; } } } return c/samples.length; }
+  onPath(user,samples,r){ if(!user.length) return 0; let c=0; for(const u of user){ let m=1e9; for(const s of samples){ const d=Math.hypot(s.x-u.x,s.y-u.y); if(d<m) m=d; } if(m<=r) c++; } return c/user.length; }
+  userNorm(){ return this.userPoints.map(p=>({x:p.x/440*100,y:p.y/440*100})); }
+  startOK(user,start,r){ return user.length>0 && Math.hypot(user[0].x-start[0],user[0].y-start[1])<=r; }
+
+  classifyL1(s){ const u=this.userNorm(); if(u.length<5) return false; const sm=this.resample(s.path,120);
+    return this.coverage(sm,u,20)>=0.6 && this.onPath(u,sm,22)>=0.5 && this.startOK(u,s.path[0],28); }
+  classifyL2(s){ const u=this.userNorm(); if(u.length<5) return 'bad'; const sm=this.resample(s.path,120);
+    const okStart=this.startOK(u,s.path[0],28);
+    if(this.coverage(sm,u,19)<0.55 || this.onPath(u,sm,20)<0.45 || !okStart) return 'bad';
+    if(this.coverage(sm,u,8)>=0.88 && this.onPath(u,sm,9)>=0.74) return 'crit';
+    return 'hit'; }
+
+  // =========================================================
+  //  CANVAS
+  // =========================================================
+  setCanvasRef=(el)=>{ if(!el){ return; } if(this.canvasEl===el && this.ctx) return; this.canvasEl=el; el.width=440; el.height=440; this.ctx=el.getContext('2d'); this.userPoints=[]; this.startActiveLevel(); };
+  setTimerRef=(el)=>{ this.timerEl=el; };
+  setRingRef=(el)=>{ this.ringEl=el; };
+
+  startActiveLevel(){
+    this.stopTick();
+    if(this.state.screen==='level1') this.beginL1();
+    else if(this.state.screen==='level2') this.beginL2();
+    else if(this.state.screen==='level3') this.beginL3();
+    else if(this.state.screen==='level4') this.beginL4();
+    this.tickLoop();
+  }
+  stopTick(){ if(this.rafId){ cancelAnimationFrame(this.rafId); this.rafId=null; } this._last=null; }
+  tickLoop=()=>{
+    const now=performance.now(); const dt=this._last?Math.min(0.05,(now-this._last)/1000):0; this._last=now;
+    this.renderCanvas(now);
+    const combatScreen=this.state.screen==='level2'||this.state.screen==='level4';
+    if(combatScreen && !this.state.paused && this.combatActive){ this.combatTick(dt); }
+    this.rafId=requestAnimationFrame(this.tickLoop);
+  };
+
+  renderCanvas(now){
+    const ctx=this.ctx; if(!ctx) return; ctx.clearRect(0,0,440,440);
+    if(this.state.screen==='level3'||this.state.screen==='level4'){ this.renderCharCanvas(now); return; }
+    const S=440;
+    if(this.activeStroke){
+      const pts=this.activeStroke.path.map(p=>({x:p[0]/100*S,y:p[1]/100*S}));
+      const guided=this.state.screen==='level1' && this.state.phase==='guided';
+      if(guided){
+        ctx.save(); ctx.setLineDash([5,12]); ctx.lineCap='round'; ctx.lineWidth=14; ctx.strokeStyle='rgba(184,134,42,0.55)';
+        ctx.beginPath(); ctx.moveTo(pts[0].x,pts[0].y); for(let i=1;i<pts.length;i++) ctx.lineTo(pts[i].x,pts[i].y); ctx.stroke(); ctx.restore();
+        const end=pts[pts.length-1], prev=pts[pts.length-2]; const a=Math.atan2(end.y-prev.y,end.x-prev.x);
+        ctx.save(); ctx.fillStyle='rgba(192,57,43,0.8)'; ctx.translate(end.x,end.y); ctx.rotate(a);
+        ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(-16,-9); ctx.lineTo(-16,9); ctx.closePath(); ctx.fill(); ctx.restore();
+        const pr=13+Math.sin(now/260)*4;
+        ctx.beginPath(); ctx.arc(pts[0].x,pts[0].y,pr,0,7); ctx.fillStyle='rgba(192,57,43,0.85)'; ctx.fill();
+        ctx.beginPath(); ctx.arc(pts[0].x,pts[0].y,5,0,7); ctx.fillStyle='#fff'; ctx.fill();
+      } else {
+        ctx.save(); ctx.lineCap='round'; ctx.lineJoin='round'; ctx.lineWidth=16; ctx.strokeStyle='rgba(42,36,32,0.1)';
+        ctx.beginPath(); ctx.moveTo(pts[0].x,pts[0].y); for(let i=1;i<pts.length;i++) ctx.lineTo(pts[i].x,pts[i].y); ctx.stroke(); ctx.restore();
+        ctx.beginPath(); ctx.arc(pts[0].x,pts[0].y,8,0,7); ctx.fillStyle='rgba(192,57,43,0.5)'; ctx.fill();
+      }
+    }
+    if(this.userPoints && this.userPoints.length>1){
+      ctx.save(); ctx.lineCap='round'; ctx.lineJoin='round'; ctx.lineWidth=this.brushW||13; ctx.strokeStyle='#2a2420';
+      ctx.beginPath(); ctx.moveTo(this.userPoints[0].x,this.userPoints[0].y);
+      for(let i=1;i<this.userPoints.length;i++) ctx.lineTo(this.userPoints[i].x,this.userPoints[i].y); ctx.stroke(); ctx.restore();
+    }
+  }
+  renderCharCanvas(now){
+    const ctx=this.ctx, S=440; const ch=this.activeChar; if(!ch) return;
+    const scale=p=>({x:p[0]/100*S,y:p[1]/100*S});
+    const drawPath=(st)=>{ const pts=st.map(scale); ctx.beginPath(); ctx.moveTo(pts[0].x,pts[0].y); for(let i=1;i<pts.length;i++) ctx.lineTo(pts[i].x,pts[i].y); ctx.stroke(); };
+    // ghost of all strokes
+    ctx.save(); ctx.lineCap='round'; ctx.lineJoin='round'; ctx.lineWidth=17; ctx.strokeStyle='rgba(42,36,32,0.08)';
+    ch.strokes.forEach(drawPath); ctx.restore();
+    // completed strokes (solid)
+    ctx.save(); ctx.lineCap='round'; ctx.lineJoin='round'; ctx.lineWidth=15; ctx.strokeStyle='#2a2420';
+    (this.completedStrokes||[]).forEach(drawPath); ctx.restore();
+    // current stroke guide
+    const idx=this.state.charStrokeIndex; const cur=ch.strokes[idx];
+    if(cur){ const pts=cur.map(scale);
+      ctx.save(); ctx.setLineDash([5,12]); ctx.lineCap='round'; ctx.lineWidth=13; ctx.strokeStyle='rgba(192,57,43,0.5)';
+      ctx.beginPath(); ctx.moveTo(pts[0].x,pts[0].y); for(let i=1;i<pts.length;i++) ctx.lineTo(pts[i].x,pts[i].y); ctx.stroke(); ctx.restore();
+      const end=pts[pts.length-1], prev=pts[pts.length-2]; const a=Math.atan2(end.y-prev.y,end.x-prev.x);
+      ctx.save(); ctx.fillStyle='rgba(192,57,43,0.78)'; ctx.translate(end.x,end.y); ctx.rotate(a);
+      ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(-15,-8); ctx.lineTo(-15,8); ctx.closePath(); ctx.fill(); ctx.restore();
+      const pr=12+Math.sin(now/260)*3;
+      ctx.beginPath(); ctx.arc(pts[0].x,pts[0].y,pr,0,7); ctx.fillStyle='rgba(192,57,43,0.92)'; ctx.fill();
+      ctx.fillStyle='#fff'; ctx.font='bold 15px Fredoka, sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.fillText(String(idx+1), pts[0].x, pts[0].y);
+    }
+    // user live stroke
+    if(this.userPoints && this.userPoints.length>1){
+      ctx.save(); ctx.lineCap='round'; ctx.lineJoin='round'; ctx.lineWidth=this.brushW||13; ctx.strokeStyle='#2a2420';
+      ctx.beginPath(); ctx.moveTo(this.userPoints[0].x,this.userPoints[0].y);
+      for(let i=1;i<this.userPoints.length;i++) ctx.lineTo(this.userPoints[i].x,this.userPoints[i].y); ctx.stroke(); ctx.restore();
+    }
+  }
+  ptFromEvent(e){ const r=e.currentTarget.getBoundingClientRect(); return {x:(e.clientX-r.left)/r.width*440,y:(e.clientY-r.top)/r.height*440}; }
+  onCanvasDown=(e)=>{ if(this.locked||this.state.paused) return; if(this.drawing) return; e.preventDefault(); this.ensureAudio(); e.currentTarget.setPointerCapture(e.pointerId);
+    this.activePointerId=e.pointerId; this.brushW=e.pointerType==='pen'?10:(e.pointerType==='mouse'?12:15); this.drawing=true; this.userPoints=[this.ptFromEvent(e)]; };
+  onCanvasMove=(e)=>{ if(!this.drawing||e.pointerId!==this.activePointerId) return; e.preventDefault(); this.userPoints.push(this.ptFromEvent(e)); };
+  onCanvasUp=(e)=>{ if(!this.drawing||e.pointerId!==this.activePointerId) return; e.preventDefault(); this.drawing=false; try{e.currentTarget.releasePointerCapture(e.pointerId);}catch(_){ } this.evaluate(); };
+  onCanvasCancel=()=>{ this.drawing=false; this.activePointerId=null; this.userPoints=[]; };
+
+  evaluate(){
+    if(this.state.screen==='level1') this.evalL1();
+    else if(this.state.screen==='level2') this.evalL2();
+    else if(this.state.screen==='level3') this.evalL3();
+    else if(this.state.screen==='level4') this.evalL4();
+  }
+
+  // =========================================================
+  //  LEVEL 1
+  // =========================================================
+  beginL1(){ this.locked=false; this.userPoints=[]; this.activeStroke=this.STROKES[this.state.strokeIndex]; this.startMusic('train'); }
+  presentStroke(){ this.userPoints=[]; this.activeStroke=this.STROKES[this.state.strokeIndex]; }
+  evalL1(){
+    const s=this.activeStroke; const pass=this.classifyL1(s);
+    if(!pass){ this.locked=true; this.traceRetry(); setTimeout(()=>{ this.userPoints=[]; this.locked=false; this.setState({phase:'guided'}); },650); return; }
+    if(this.state.phase==='guided'){ this.pop(); this.userPoints=[]; this.setState({phase:'free'}); return; }
+    // free pass -> strike + advance
+    this.locked=true; this.dummyHit(); this.speakStrokeName(s);
+    this.triggerAttack({avatarAnim:'strike',dummyAnim:'shake'});
+    setTimeout(()=>this.setState({avatarAnim:'',dummyAnim:''}),520);
+    this.recordStroke(s.id,'hit');
+    setTimeout(()=>{
+      const ni=this.state.strokeIndex+1;
+      if(ni>=this.STROKES.length){ this.win(1); return; }
+      this.userPoints=[]; this.activeStroke=this.STROKES[ni]; this.locked=false; this.setState({strokeIndex:ni,phase:'guided'});
+    },640);
+  }
+
+  // =========================================================
+  //  LEVEL 2
+  // =========================================================
+  beginL2(){ this.combatActive=true; this.combatLevel=2; this.avatarMax=20; this.oppMax=20; this.windupMs=0; this.windupFull=6000; this.timeLeft=90; this.locked=false; this.userPoints=[]; this.intensified=false;
+    this.newPrompt(); this.startMusic('combat'); this.updateTimerEl(); this.updateRingEl(); }
+  newPrompt(){ const s=this.STROKES[Math.floor(Math.random()*this.STROKES.length)]; this.activeStroke=s; this.userPoints=[]; this.setState({promptStrokeId:s.id}); }
+  combatTick(dt){
+    this.timeLeft-=dt; if(this.timeLeft<=0){ this.timeLeft=0; this.updateTimerEl(); this.endCombatLoss(); return; }
+    this.windupMs+=dt*1000; if(this.windupMs>=this.windupFull){ this.opponentAttack(); }
+    this.updateTimerEl(); this.updateRingEl();
+    const am=this.avatarMax||20, om=this.oppMax||20;
+    if((this.state.avatarHP/am<0.3 || this.state.opponentHP/om<0.3)) this.intensify();
+  }
+  updateTimerEl(){ if(this.timerEl) this.timerEl.textContent=Math.ceil(this.timeLeft)+'s'; }
+  updateRingEl(){ if(!this.ringEl) return; const pct=Math.min(1,this.windupMs/this.windupFull); const C=339.29;
+    this.ringEl.setAttribute('stroke-dashoffset', (C*(1-pct)).toFixed(1));
+    this.ringEl.setAttribute('stroke', pct>0.66?'#c0392b':(pct>0.33?'#e8862a':'#e8b84a')); }
+  evalL2(){
+    if(this.locked) return; const s=this.activeStroke; const res=this.classifyL2(s);
+    if(res==='bad'){ this.traceRetry(); this.recordStroke(s.id,'miss'); this.newPrompt(); return; }
+    const crit=res==='crit'; const dmg=crit?2:1;
+    this.locked=true; this.triggerBossBlock();
+    if(crit){ this.criticalHit(); this.triggerAttack({avatarAnim:'crit',opponentAnim:'flinch'}); } else { this.hit(); this.triggerAttack({avatarAnim:'strike',opponentAnim:'flinch'}); }
+    this.speakStrokeName(s); this.recordStroke(s.id,crit?'crit':'hit');
+    this.windupMs=0; this.updateRingEl();
+    const nh=Math.max(0,this.state.opponentHP-dmg);
+    setTimeout(()=>this.setState({avatarAnim:'',opponentAnim:''}),520);
+    this.setState({opponentHP:nh});
+    setTimeout(()=>{ if(nh<=0){ this.win(2); } else { this.locked=false; this.newPrompt(); } },560);
+  }
+  opponentAttack(){
+    this.windupMs=0; this.updateRingEl(); if(this.locked){ return; } this.locked=true;
+    this.missImpact();
+    this.triggerBossAttack({opponentAnim:'strikeL',blocking:true});
+    setTimeout(()=>this.setState({blocking:false}),1000);
+    const dmg=this.combatLevel===4?3:2;
+    const nh=Math.max(0,this.state.avatarHP-dmg);
+    setTimeout(()=>{ this.setState({avatarAnim:'hurt',hurt:1,opponentAnim:''}); setTimeout(()=>this.setState({avatarAnim:'',hurt:0}),420); },260);
+    this.setState({avatarHP:nh});
+    setTimeout(()=>{ if(nh<=0){ this.endCombatLoss(); } else { this.locked=false; if(this.combatLevel===4){ this.newCharL4(); } else { this.newPrompt(); } } },780);
+  }
+  endCombatLoss(){ this.combatActive=false; this.defeat(this.combatLevel||2); }
+  triggerAttack(extra){ this.setState({attacking:true, ...(extra||{})}); clearTimeout(this._atkT); this._atkT=setTimeout(()=>this.setState({attacking:false}),1000); }
+  triggerBossAttack(extra){ this.setState({bossAttacking:true, ...(extra||{})}); clearTimeout(this._bAtkT); this._bAtkT=setTimeout(()=>this.setState({bossAttacking:false}),1000); }
+  triggerBossBlock(){ this.setState({bossBlocking:true}); clearTimeout(this._bBlkT); this._bBlkT=setTimeout(()=>this.setState({bossBlocking:false}),1000); }
+
+  // =========================================================
+  //  CHARACTER SEQUENCE (shared by L3 & L4)
+  // =========================================================
+  strokeQuality(path){
+    const u=this.userNorm(); if(u.length<5) return {pass:false,score:0};
+    const sm=this.resample(path,120);
+    const okStart=this.startOK(u,path[0],32);
+    const cov=this.coverage(sm,u,20), onp=this.onPath(u,sm,22);
+    const pass=cov>=0.5 && onp>=0.42 && okStart;
+    const score=Math.min(this.coverage(sm,u,11), this.onPath(u,sm,12));
+    return {pass,score};
+  }
+  charText(ch){ if(!ch) return ''; return this.written()==='simplified'?ch.t.simplified:ch.t.traditional; }
+  speakChar(ch){
+    if(this.state.muted||!window.speechSynthesis) return;
+    try{ window.speechSynthesis.cancel(); const lang=this.lang().voice;
+      const text=this.written()==='english'?ch.en:(this.written()==='simplified'?ch.t.simplified:ch.t.traditional);
+      const u=new SpeechSynthesisUtterance(text); u.lang=lang; u.rate=0.8;
+      const vs=window.speechSynthesis.getVoices();
+      const v=vs.find(x=>x.lang&&x.lang.toLowerCase()===lang.toLowerCase())||vs.find(x=>x.lang&&x.lang.toLowerCase().startsWith(lang.slice(0,2)));
+      if(v) u.voice=v;
+      window.speechSynthesis.speak(u);
+    }catch(e){}
+  }
+  recordChar(ch,kind){ const id='char_'+ch.en; const m=this.parentMetrics.strokes[id]||{hits:0,crits:0,misses:0}; if(kind==='crit')m.crits++; else if(kind==='hit')m.hits++; else m.misses++; this.parentMetrics.strokes[id]=m; }
+
+  // =========================================================
+  //  LEVEL 3 — stroke-order sequence training
+  // =========================================================
+  beginL3(){ this.locked=false; this.userPoints=[]; this.completedStrokes=[];
+    this.activeChar=this.CHARS_L3[this.state.charIndex%this.CHARS_L3.length]; this.startMusic('train'); }
+  evalL3(){
+    if(this.locked) return;
+    const ch=this.activeChar; const idx=this.state.charStrokeIndex; const stroke=ch.strokes[idx];
+    const q=this.strokeQuality(stroke);
+    if(!q.pass){ this.traceRetry(); this.userPoints=[]; return; }
+    this.pop(); this.completedStrokes.push(stroke); this.userPoints=[];
+    const ni=idx+1;
+    if(ni<ch.strokes.length){ this.setState({charStrokeIndex:ni}); return; }
+    // character complete -> strike dummy, advance
+    this.locked=true; this.dummyHit(); this.speakChar(ch); this.recordChar(ch,'hit');
+    this.triggerAttack({avatarAnim:'strike',dummyAnim:'shake',charStrokeIndex:ni});
+    setTimeout(()=>this.setState({avatarAnim:'',dummyAnim:''}),520);
+    setTimeout(()=>{
+      const nc=this.state.charIndex+1;
+      if(nc>=this.CHARS_L3.length){ this.win(3); return; }
+      this.completedStrokes=[]; this.userPoints=[]; this.activeChar=this.CHARS_L3[nc]; this.locked=false;
+      this.setState({charIndex:nc,charStrokeIndex:0});
+    },720);
+  }
+
+  // =========================================================
+  //  LEVEL 4 — full-character combat
+  // =========================================================
+  beginL4(){ this.combatActive=true; this.combatLevel=4; this.avatarMax=20; this.oppMax=24;
+    this.windupMs=0; this.windupFull=9000; this.timeLeft=99; this.locked=false; this.userPoints=[]; this.completedStrokes=[]; this.intensified=false;
+    this.newCharL4(); this.startMusic('combat'); this.updateTimerEl(); this.updateRingEl(); }
+  newCharL4(){ const pool=this.CHARS_L4; let ch=pool[Math.floor(Math.random()*pool.length)];
+    if(this.activeChar && pool.length>1){ let g=0; while(ch===this.activeChar && g<6){ ch=pool[Math.floor(Math.random()*pool.length)]; g++; } }
+    this.activeChar=ch; this.completedStrokes=[]; this.userPoints=[]; this.charScoreSum=0; this.charScoreN=0;
+    this.setState({charStrokeIndex:0}); }
+  evalL4(){
+    if(this.locked||!this.combatActive) return;
+    const ch=this.activeChar; const idx=this.state.charStrokeIndex; const stroke=ch.strokes[idx];
+    const q=this.strokeQuality(stroke);
+    if(!q.pass){ this.traceRetry(); this.userPoints=[]; return; }
+    this.pop(); this.completedStrokes.push(stroke); this.charScoreSum+=q.score; this.charScoreN++; this.userPoints=[];
+    const ni=idx+1;
+    if(ni<ch.strokes.length){ this.setState({charStrokeIndex:ni}); return; }
+    // character complete -> strike
+    const avg=this.charScoreN?this.charScoreSum/this.charScoreN:0; const crit=avg>=0.72; const dmg=crit?2:1;
+    this.locked=true; this.triggerBossBlock();
+    if(crit){ this.criticalHit(); this.triggerAttack({avatarAnim:'crit',opponentAnim:'flinch',charStrokeIndex:ni}); }
+    else { this.hit(); this.triggerAttack({avatarAnim:'strike',opponentAnim:'flinch',charStrokeIndex:ni}); }
+    this.speakChar(ch); this.recordChar(ch,crit?'crit':'hit');
+    this.windupMs=0; this.updateRingEl();
+    const nh=Math.max(0,this.state.opponentHP-dmg);
+    setTimeout(()=>this.setState({avatarAnim:'',opponentAnim:''}),520);
+    this.setState({opponentHP:nh});
+    setTimeout(()=>{ if(nh<=0){ this.win(4); } else { this.locked=false; this.newCharL4(); } },600);
+  }
+
+  // =========================================================
+  //  metrics
+  // =========================================================
+  recordStroke(id,kind){ const m=this.parentMetrics.strokes[id]||{hits:0,crits:0,misses:0}; if(kind==='crit')m.crits++; else if(kind==='hit')m.hits++; else m.misses++; this.parentMetrics.strokes[id]=m; }
+
+  // =========================================================
+  //  navigation
+  // =========================================================
+  enterLevel(n){
+    this.ensureAudio(); this.pop();
+    this.stopTick();
+    if(n===1){ this.combatActive=false; this.setState({screen:'level1',paused:false,strokeIndex:0,phase:'guided',avatarAnim:'',dummyAnim:''}); }
+    else if(n===2){ this.combatLevel=2; this.avatarMax=20; this.oppMax=20; this.setState({screen:'level2',paused:false,avatarHP:20,opponentHP:20,avatarAnim:'',opponentAnim:'',hurt:0,promptStrokeId:null}); }
+    else if(n===3){ this.combatActive=false; this.setState({screen:'level3',paused:false,charIndex:0,charStrokeIndex:0,avatarAnim:'',dummyAnim:''}); }
+    else if(n===4){ this.combatLevel=4; this.avatarMax=20; this.oppMax=24; this.setState({screen:'level4',paused:false,avatarHP:20,opponentHP:24,charStrokeIndex:0,avatarAnim:'',opponentAnim:'',hurt:0}); }
+  }
+  win(level){
+    this.stopTick(); this.stopMusic(); this.combatActive=false;
+    const won=this.state.levelsWon.includes(level)?this.state.levelsWon:[...this.state.levelsWon,level];
+    this.parentMetrics.levels[level]=this.parentMetrics.levels[level]||{wins:0,attempts:0}; this.parentMetrics.levels[level].wins++;
+    if(level>=4) this.trophyStinger(); else this.victoryStinger();
+    this.setState({screen:'win',winLevel:level,levelsWon:won,paused:false},()=>this.persist());
+  }
+  defeat(level){
+    this.stopTick(); this.stopMusic(); this.combatActive=false; this.defeatStinger();
+    this.setState({screen:'defeat',defeatLevel:level,paused:false});
+  }
+  goHome(){ this.stopTick(); this.stopMusic(); this.combatActive=false; this.pop();
+    const ju=this.state.justUnlocked; this.setState({screen:'home',paused:false,justUnlocked:0});
+    if(ju) setTimeout(()=>this.levelUnlockChime(),250);
+  }
+  proceedNext(){ const next=this.state.winLevel+1; if(next>=2 && next<=4){ this.enterLevel(next); } else { this.goHome(); } }
+  retry(){ this.pop(); this.enterLevel(this.state.defeatLevel); }
+  togglePause=()=>{ this.ensureAudio(); this.pauseToggle(); this.setState({paused:!this.state.paused}); };
+  resume=()=>{ this.pauseToggle(); this.setState({paused:false}); };
+  toggleMute=()=>{ this.ensureAudio(); const m=!this.state.muted; this.setState({muted:m},()=>{ this.applyMute(); this.persist(); }); };
+  setLang(id){ this.ensureAudio(); this.setState({langId:id,langMenuOpen:false},()=>{ this.languageSwitchConfirm(); this.persist(); }); }
+  toggleLangMenu=()=>{ this.ensureAudio(); this.pop(); this.setState({langMenuOpen:!this.state.langMenuOpen}); };
+
+  // =========================================================
+  //  RENDER VALUES
+  // =========================================================
+  hpStyle(hp,max){ const m=max||20; const pct=Math.max(0,hp/m*100); const col=pct>50?'#5ba85a':(pct>25?'#e8b84a':'#c0392b');
+    return {width:pct+'%',height:'100%',background:col,borderRadius:'7px',transition:'width .35s ease, background .35s ease'}; }
+  damageFilter(hp,max){ const m=max||20; const r=hp/m; if(r>0.66) return 'none'; if(r>0.33) return 'brightness(0.86) sepia(0.2)'; return 'brightness(0.7) sepia(0.45) saturate(1.3)'; }
+  strokeDots(ch,idx){ if(!ch) return []; return ch.strokes.map((_,i)=>{ const done=i<idx; const cur=i===idx;
+    const base={width:'30px',height:'30px',borderRadius:'50%',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:"'Fredoka',sans-serif",fontWeight:700,fontSize:'14px',transition:'all .2s'};
+    let style;
+    if(done) style={...base,background:'#e8b84a',color:'#5e3a1a',boxShadow:'0 2px 0 #b8862a'};
+    else if(cur) style={...base,background:'#c0392b',color:'#fff',boxShadow:'0 0 0 3px rgba(192,57,43,.3)'};
+    else style={...base,background:'rgba(245,230,200,.2)',color:'rgba(245,230,200,.55)',border:'2px solid rgba(245,230,200,.3)'};
+    return {num:i+1, style};
+  }); }
+  animStyle(name){ const map={strike:'kfStrikeR .5s cubic-bezier(.3,.7,.3,1)',crit:'kfCritR .6s cubic-bezier(.3,.7,.3,1)',hurt:'kfHurt .42s ease',shake:'kfShake .5s ease',flinch:'kfFlinch .42s ease',strikeL:'kfStrikeL .5s cubic-bezier(.3,.7,.3,1)'};
+    if(name && map[name]) return {height:'100%',transformOrigin:'bottom center',animation:map[name]}; return {height:'100%',transformOrigin:'bottom center',animation:'kfIdle 2.8s ease-in-out infinite'}; }
+  oppAnimStyle(name){ const base={height:'100%',transform:'scaleX(-1)'}; const map={flinch:'kfFlinch .42s ease',strikeL:'kfStrikeL .5s cubic-bezier(.3,.7,.3,1)'};
+    if(name&&map[name]) return {...base,animation:map[name]}; return base; }
+
+  langButtons(forPause){
+    return this.LANGS.map(l=>{ const active=l.id===this.state.langId;
+      const base={height:'40px',padding:'0 14px',borderRadius:'20px',cursor:'pointer',fontFamily:"'Noto Sans TC','Noto Sans SC','Fredoka',sans-serif",fontWeight:600,fontSize:'13px',transition:'all .15s'};
+      const style=active?{...base,background:'#e8b84a',color:'#5e3a1a',border:'2px solid #b8862a',boxShadow:'0 2px 0 #b8862a'}:{...base,background:'rgba(224,207,160,.65)',color:'#5e3a1a',border:'2px solid transparent'};
+      const pbase={height:'44px',borderRadius:'12px',cursor:'pointer',fontFamily:"'Noto Sans TC','Noto Sans SC','Fredoka',sans-serif",fontWeight:600,fontSize:'13px'};
+      const pstyle=active?{...pbase,background:'#e8b84a',color:'#5e3a1a',border:'2px solid #b8862a'}:{...pbase,background:'#fff',color:'#5e3a1a',border:'2px solid #e0cfa0'};
+      const mbase={display:'flex',alignItems:'center',justifyContent:'space-between',gap:'8px',width:'100%',height:'42px',padding:'0 14px',borderRadius:'10px',cursor:'pointer',textAlign:'left',fontFamily:"'Noto Sans TC','Noto Sans SC','Fredoka',sans-serif",fontWeight:600,fontSize:'14px',transition:'all .12s'};
+      const mstyle=active?{...mbase,background:'#e8b84a',color:'#5e3a1a',border:'2px solid #b8862a'}:{...mbase,background:'transparent',color:'#5e3a1a',border:'2px solid transparent'};
+      return {label:l.label,style,pauseStyle:pstyle,menuStyle:mstyle,onClick:()=>this.setLang(l.id)};
+    });
+  }
+  tiles(){
+    const won=this.state.levelsWon;
+    const unlocked={1:true,2:won.includes(1),3:won.includes(2),4:won.includes(3)};
+    const built={1:true,2:true,3:true,4:true};
+    const lockKey={2:'locked2',3:'locked3',4:'locked4'};
+    return [1,2,3,4].map(n=>{
+      const isUnlocked=unlocked[n]; const isBuilt=built[n]; const locked=!isUnlocked;
+      const style={position:'relative',width:'clamp(120px,14.4vw,172px)',aspectRatio:'419 / 610',border:'none',background:'transparent',cursor:isUnlocked&&isBuilt?'pointer':'default',padding:0,display:'block',transition:'transform .15s ease',animation:`kfCardFloat ${3.6+n*0.25}s ease-in-out ${n*0.3}s infinite`};
+      const imgStyle={width:'100%',height:'100%',objectFit:'contain',display:'block',filter:isUnlocked?'drop-shadow(0 10px 16px rgba(0,0,0,.45))':'grayscale(.85) brightness(.7) drop-shadow(0 8px 14px rgba(0,0,0,.45))'};
+      let lockText=this.L(lockKey[n]||'soon'); if(!isBuilt) lockText=this.L('soon');
+      const name1=`第${this.CN[n-1]}關 · ${this.levelName(n)}`;
+      const en={1:'Foundation',2:'Sparring',3:'Sequence',4:'Combat'}[n];
+      return {num:n, name1, name2:en, locked, shimmer:false, lockText, aria:name1, style, imgStyle, img:`uploads/Home_level_${n}_button.png`,
+        onClick:()=>{ if(isUnlocked&&isBuilt) this.enterLevel(n); else this.pop(); } };
+    });
+  }
+
+  renderVals(){
+    const sc=this.state.screen; const w=this.written();
+    const confetti = sc==='win' ? Array.from({length:40}).map((_,i)=>React.createElement('div',{key:i,style:{position:'absolute',left:(Math.random()*100)+'%',top:'-6%',width:'9px',height:(10+Math.random()*8)+'px',background:['#e8b84a','#c0392b','#4a9878','#f5e6c8'][i%4],borderRadius:'2px',animation:`kfConfetti ${1.8+Math.random()*1.6}s linear ${Math.random()*0.7}s infinite`}})) : null;
+
+    const strokeS=this.STROKES[this.state.strokeIndex];
+    const l3ch=this.CHARS_L3[this.state.charIndex%this.CHARS_L3.length];
+    const promptS=this.STROKES.findIndex?this.STROKES.find(x=>x.id===this.state.promptStrokeId):null;
+    const winLvl=this.state.winLevel; const defLvl=this.state.defeatLevel;
+    const winLevelLine = w==='english' ? `${this.LEVELS[winLvl].name.english} Complete` : `${this.L('complete')}第${this.CN[winLvl-1]}關：${this.levelName(winLvl)}`;
+
+    return {
+      isHome:sc==='home' && !this.state.loading, isL1:sc==='level1', isL2:sc==='level2', isL3:sc==='level3', isL4:sc==='level4', isWin:sc==='win', isDefeat:sc==='defeat',
+      isLoading:this.state.loading,
+      loadPctText:`${Math.round((this.state.loadProgress||0)*100)}%`,
+      loadBarStyle:{height:'100%',width:`${Math.round((this.state.loadProgress||0)*100)}%`,background:'linear-gradient(90deg,#c0392b,#e8b84a)',borderRadius:'6px',transition:'width .25s ease'},
+      isPaused:this.state.paused && (sc==='level1'||sc==='level2'||sc==='level3'||sc==='level4'),
+      showRotate:this.state.showRotate,
+      gameTitle:this.L('title'), soundLabel:this.L('soundOn'), soundIcon:this.state.muted?'🔇':'🔊',
+      onToggleMute:this.toggleMute,
+      langButtons:this.langButtons(false),
+      currentLangLabel:this.lang().label, langMenuOpen:this.state.langMenuOpen, onToggleLangMenu:this.toggleLangMenu,
+      langChevronStyle:{display:'inline-block',fontSize:'12px',transition:'transform .18s',transform:this.state.langMenuOpen?'rotate(180deg)':'rotate(0deg)'},
+      tiles:this.tiles(),
+      fullyComplete:this.state.levelsWon.includes(4), trophyHomeText:this.L('trophy'),
+
+      // L1
+      l1ProgressText:`${this.L('strokeWord')} ${Math.min(this.state.strokeIndex+1,8)}/8`,
+      l1Guide:this.state.phase==='guided'?this.L('guided'):this.L('free'),
+      strokeMain:this.strokeName(strokeS),
+      strokeSub:w==='english'?strokeS.py:strokeS.py,
+      onTogglePause:this.togglePause,
+      onCanvasDown:this.onCanvasDown, onCanvasMove:this.onCanvasMove, onCanvasUp:this.onCanvasUp, onCanvasCancel:this.onCanvasCancel,
+      setCanvasRef:this.setCanvasRef, setTimerRef:this.setTimerRef, setRingRef:this.setRingRef,
+      avatarAnimStyle:this.animStyle(this.state.avatarAnim),
+      dummyAnimStyle:this.animStyle(this.state.dummyAnim==='shake'?'shake':''),
+      opponentAnimStyle:this.oppAnimStyle(this.state.opponentAnim),
+
+      // L2 / L4 combat
+      avatarLabel:this.L('avatar'), oppLabel:sc==='level4'?this.L('grandmaster'):this.L('master'),
+      avatarHpStyle:this.hpStyle(this.state.avatarHP,this.avatarMax), oppHpStyle:this.hpStyle(this.state.opponentHP,this.oppMax),
+      avatarHpText:`${this.state.avatarHP}/${this.avatarMax||20}`, oppHpText:`${this.state.opponentHP}/${this.oppMax||20}`,
+      avatarBoxStyle:{...this.animStyle(this.state.avatarAnim),filter:this.damageFilter(this.state.avatarHP,this.avatarMax)},
+      playerImg:this.state.blocking?'uploads/Character_Block.png':(this.state.attacking?'uploads/Character_Attack-850893fd.png':'uploads/Character_Stand.png'),
+      practiceImg:this.state.attacking?'uploads/Character_Attack-850893fd.png':'uploads/Character_Stand.png',
+      playerImgStyle:{height:'100%',width:'auto',filter:'drop-shadow(0 8px 12px rgba(0,0,0,.45))'},
+      oppBoxStyle:{...this.oppAnimStyle(this.state.opponentAnim),alignSelf:'flex-end',filter:this.damageFilter(this.state.opponentHP,this.oppMax)},
+      bossImg:this.state.bossBlocking?'uploads/Boss_Block.png':(this.state.bossAttacking?'uploads/Boss_Attack-2f426770.png':'uploads/Boss_Stand-6eded0c0.png'),
+      monkImg:this.state.bossBlocking?'uploads/Monk_Block.png':(this.state.bossAttacking?'uploads/Monk_Punch.png':'uploads/Monk_Stand.png'),
+      hurtFlashStyle:{position:'absolute',inset:'-10%',borderRadius:'50%',background:'#c0392b',opacity:this.state.hurt?0.4:0,transition:'opacity .25s',pointerEvents:'none'},
+      promptMain:promptS?this.strokeName(promptS):'',
+      l2Guide:this.L('l2Guide'),
+
+      // L3 — stroke-order sequence training
+      l3Progress:`${this.L('charWord')} ${Math.min(this.state.charIndex+1,this.CHARS_L3.length)}/${this.CHARS_L3.length}`,
+      l3CharMain:sc==='level3'?this.charText(l3ch):'',
+      l3Py:(sc==='level3'&&l3ch)?l3ch.py:'',
+      l3Meaning:(sc==='level3'&&l3ch)?l3ch.en:'',
+      l3OrderLabel:this.L('strokeOrder'),
+      l3Guide:this.L('l3Guide'),
+      l3Dots:sc==='level3'?this.strokeDots(l3ch,this.state.charStrokeIndex):[],
+
+      // L4 — full-character combat
+      l4Prompt:this.L('writePrompt'),
+      l4CharMain:sc==='level4'?this.charText(this.activeChar):'',
+      l4Py:(sc==='level4'&&this.activeChar)?this.activeChar.py:'',
+      l4Guide:this.L('l4Guide'),
+      l4Dots:sc==='level4'?this.strokeDots(this.activeChar,this.state.charStrokeIndex):[],
+
+      // win
+      isTrophy:winLvl>=4, winTitle:winLvl>=4?this.L('trophy'):this.L('victory'), winSub:winLevelLine,
+      showWinImg:winLvl>=1 && winLvl<=3, showTrophyImg:winLvl>=4, showWinSvg:!(winLvl>=1),
+      winHasNext:winLvl>=1 && winLvl<4, proceedLabel:this.L('proceed'),
+      onProceed:()=>{ this.pop(); this.proceedNext(); }, onHome:()=>this.goHome(), confetti,
+
+      // defeat
+      defeatTitle:this.L('keep'), defeatSub:this.L('keepSub'), retryLabel:this.L('retry'), onRetry:()=>this.retry(),
+
+      // pause
+      pauseTitle:this.L('pause'), pauseHint:this.L('pauseHint'), resumeLabel:this.L('resume'), homeLabel:this.L('home'), onResume:this.resume,
+
+      rotateText:this.L('rotate')
+    };
+  }
+}
+</script>
+</body>
+</html>
