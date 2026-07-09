@@ -110,7 +110,10 @@ img { -webkit-user-drag: none; }
 
 .anim-box { height: 100%; transform-origin: bottom center; animation: kfIdle 2.8s ease-in-out infinite; }
 .char-img { height: 100%; width: auto; filter: drop-shadow(0 8px 12px rgba(0,0,0,.45)); }
-.opp-box { align-self: flex-end; transform: scaleX(-1); }
+/* Opponent wrapper is ALWAYS scaleX(-1) (never kfIdle): combined with the img's
+   own scaleX(-1) this renders the natively-left-facing art facing left, and the
+   flinch/strikeL keyframes keep the flip so poses never flip between states. */
+.opp-box { height: 100%; transform-origin: bottom center; align-self: flex-end; transform: scaleX(-1); }
 .opp-img { transform: scaleX(-1); }
 
 .arena-center { flex: 0 1 auto; display: flex; flex-direction: column; align-items: center; gap: 10px; }
